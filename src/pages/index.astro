@@ -1,0 +1,88 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="E-Commerce Disresa - Inicio">
+	<main class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+		<div class="container mx-auto px-4 py-16">
+			<div class="text-center mb-12">
+				<h1 class="text-5xl font-bold text-gray-900 mb-4">
+					🛒 E-Commerce Disresa
+				</h1>
+				<p class="text-xl text-gray-600 mb-8">
+					Tu tienda de zapatos online
+				</p>
+				<div class="inline-flex gap-4">
+					<span class="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
+						✅ Base de datos configurada
+					</span>
+					<span class="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+						✅ Astro SSR activo
+					</span>
+					<span class="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold">
+						✅ Drizzle ORM listo
+					</span>
+				</div>
+			</div>
+
+			<div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+				<div class="bg-white rounded-lg shadow-lg p-6">
+					<div class="text-4xl mb-4">📊</div>
+					<h2 class="text-2xl font-bold text-gray-800 mb-2">Base de Datos</h2>
+					<p class="text-gray-600 mb-4">
+						SQLite local con Drizzle ORM. 5 tablas configuradas con relaciones.
+					</p>
+					<ul class="text-sm text-gray-500 space-y-1">
+						<li>✓ users</li>
+						<li>✓ categories</li>
+						<li>✓ shoes</li>
+						<li>✓ invoices</li>
+						<li>✓ invoice_items</li>
+					</ul>
+				</div>
+
+				<div class="bg-white rounded-lg shadow-lg p-6">
+					<div class="text-4xl mb-4">🚀</div>
+					<h2 class="text-2xl font-bold text-gray-800 mb-2">Stack</h2>
+					<p class="text-gray-600 mb-4">
+						Tecnologías modernas para máximo rendimiento.
+					</p>
+					<ul class="text-sm text-gray-500 space-y-1">
+						<li>✓ Astro 5.x (SSR)</li>
+						<li>✓ React 19.x</li>
+						<li>✓ Tailwind CSS 4.x</li>
+						<li>✓ TypeScript estricto</li>
+						<li>✓ Node.js 24.12.0</li>
+					</ul>
+				</div>
+
+				<div class="bg-white rounded-lg shadow-lg p-6">
+					<div class="text-4xl mb-4">📦</div>
+					<h2 class="text-2xl font-bold text-gray-800 mb-2">Datos Seed</h2>
+					<p class="text-gray-600 mb-4">
+						Datos de prueba listos para usar.
+					</p>
+					<ul class="text-sm text-gray-500 space-y-1">
+						<li>✓ 1 usuario admin</li>
+						<li>✓ 3 categorías</li>
+						<li>✓ 5 zapatos</li>
+						<li>✓ Email: admin@disresa.com</li>
+						<li>✓ Pass: admin123</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="mt-12 text-center">
+				<div class="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
+					<h3 class="text-2xl font-bold text-gray-800 mb-4">🎯 Próximos Pasos</h3>
+					<div class="text-left space-y-3 text-gray-600">
+						<p>1. Explora la base de datos: <code class="bg-gray-100 px-2 py-1 rounded">npm run db:studio</code></p>
+						<p>2. Crea endpoints en: <code class="bg-gray-100 px-2 py-1 rounded">src/pages/api/</code></p>
+						<p>3. Agrega componentes React en: <code class="bg-gray-100 px-2 py-1 rounded">src/components/react/</code></p>
+						<p>4. Lee la documentación completa en: <code class="bg-gray-100 px-2 py-1 rounded">README.md</code></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+</Layout>
