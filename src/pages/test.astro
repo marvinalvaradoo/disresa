@@ -1,0 +1,41 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const envCheck = {
+  NODE_ENV: process.env.NODE_ENV || 'not set',
+  TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL ? 'SET (length: ' + process.env.TURSO_DATABASE_URL.length + ')' : 'NOT SET',
+  TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN ? 'SET (length: ' + process.env.TURSO_AUTH_TOKEN.length + ')' : 'NOT SET',
+};
+---
+
+<Layout title="Test Page - Disresa">
+  <div class="container mx-auto px-4 py-16">
+    <h1 class="text-4xl font-black mb-8">🔍 Diagnóstico de Netlify</h1>
+    
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <h2 class="text-2xl font-bold mb-4">Variables de Entorno</h2>
+      <pre class="bg-gray-100 p-4 rounded overflow-x-auto">{JSON.stringify(envCheck, null, 2)}</pre>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <h2 class="text-2xl font-bold mb-4">Estado del Servidor</h2>
+      <p class="text-green-600 font-bold">✅ El servidor Astro está funcionando correctamente</p>
+      <p class="text-gray-600 mt-2">Si ves esta página, significa que Netlify está sirviendo contenido correctamente.</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-2xl font-bold mb-4">Próximos Pasos</h2>
+      <ol class="list-decimal list-inside space-y-2">
+        <li>Verifica que las variables de entorno arriba estén configuradas</li>
+        <li>Visita <a href="/api/health" class="text-blue-600 underline">/api/health</a> para verificar la conexión a la base de datos</li>
+        <li>Si todo está bien, el problema está en la página de inicio</li>
+      </ol>
+    </div>
+
+    <div class="mt-8">
+      <a href="/" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700">
+        Intentar ir a Home
+      </a>
+    </div>
+  </div>
+</Layout>
