@@ -1,1 +1,138 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
+
+/* Performance optimizations */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Reduce layout shift with aspect ratio containers */
+.aspect-square {
+  aspect-ratio: 1 / 1;
+}
+
+/* Focus visible for better keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #fef24e;
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling for better UX */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prefers reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  * {
+    border-color: currentColor !important;
+  }
+}
+
+/* Loading skeleton animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(to right, #f0f0f0 4%, #e0e0e0 25%, #f0f0f0 36%);
+  background-size: 1000px 100%;
+}
+
+/* Improve text readability */
+body {
+  text-rendering: optimizeLegibility;
+}
+
+/* Better image rendering */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Prevent CLS with min-height on images */
+img[width][height] {
+  height: auto;
+}
+
+/* Skip link styles are in Layout.astro */
+
+/* Sileo toast notifications z-index fix */
+/* Ensure notifications appear above all other elements including sticky headers */
+[data-sileo-viewport] {
+  z-index: 99999 !important;
+}
+
+[data-sileo-toaster] {
+  z-index: 99999 !important;
+}
+
+[data-sileo-toast] {
+  z-index: 99999 !important;
+}
+
+/* Sileo custom styling - Black background theme */
+
+/* Black background for the SVG shape - this creates the rounded design */
+[data-sileo-canvas] path {
+  fill: #000000 !important;
+}
+
+/* Ensure header area is transparent */
+[data-sileo-header] {
+  background-color: transparent !important;
+}
+
+/* Keep content area transparent to preserve the shape */
+[data-sileo-content] {
+  background-color: transparent !important;
+}
+
+/* White text for description */
+[data-sileo-description] {
+  color: #ffffff !important;
+  background-color: transparent !important;
+}
+
+/* Yellow text for title */
+[data-sileo-title] {
+  color: #fef24e !important;
+}
+
+/* Yellow badge */
+[data-sileo-badge] {
+  color: #fef24e !important;
+}
+
+[data-sileo-badge][data-state] {
+  background-color: rgba(254, 242, 78, 0.2) !important;
+}
+
+/* Yellow button with black text */
+[data-sileo-button] {
+  color: #000000 !important;
+  background-color: #fef24e !important;
+  font-weight: 600 !important;
+}
+
+[data-sileo-button]:hover {
+  background-color: #fdfad7 !important;
+}

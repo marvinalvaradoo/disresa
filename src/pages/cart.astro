@@ -1,0 +1,283 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Carrito de Compras - Disresa">
+  <div class="bg-gray-50 min-h-screen py-8">
+    <div class="container mx-auto px-4">
+      <!-- Breadcrumb -->
+      <nav class="mb-6 text-sm" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2">
+          <li><a href="/" class="text-gray-600 hover:text-black focus:outline-none focus:ring-2 focus:ring-[#0061bd] rounded px-1">Inicio</a></li>
+          <li aria-hidden="true"><span class="mx-2 text-gray-400">/</span></li>
+          <li aria-current="page"><span class="text-black font-bold">Carrito</span></li>
+        </ol>
+      </nav>
+
+      <h1 class="text-4xl font-black mb-8">Carrito de Compras</h1>
+
+      <div id="cartContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Loading State -->
+        <div id="loadingState" class="lg:col-span-3 text-center py-12" role="status" aria-live="polite">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-black" aria-hidden="true"></div>
+          <p class="mt-4 text-gray-600">Cargando carrito...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden lg:col-span-3 bg-white rounded-lg p-12 text-center" role="status" aria-live="polite">
+          <div class="text-6xl mb-4" aria-hidden="true">🛒</div>
+          <h2 class="text-2xl font-bold mb-2">Tu carrito está vacío</h2>
+          <p class="text-gray-600 mb-6">Agrega productos para comenzar tu compra</p>
+          <a
+            href="/catalog"
+            class="inline-block bg-[#0061bd] text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition font-bold focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2"
+          >
+            Ver Catálogo
+          </a>
+        </div>
+
+        <!-- Cart Items -->
+        <div id="cartItems" class="hidden lg:col-span-2 space-y-4" role="list" aria-label="Productos en el carrito">
+          <!-- Items will be inserted here by JavaScript -->
+        </div>
+
+        <!-- Cart Summary -->
+        <div id="cartSummary" class="hidden lg:col-span-1">
+          <div class="bg-white rounded-lg p-6 sticky top-24" role="region" aria-label="Resumen del pedido">
+            <h2 class="text-2xl font-black mb-6">Resumen del Pedido</h2>
+            
+            <div class="space-y-4 mb-6">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Subtotal:</span>
+                <span id="subtotal" class="font-bold" aria-live="polite">Q0.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">IVA (12%):</span>
+                <span id="tax" class="font-bold" aria-live="polite">Q0.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Envío:</span>
+                <span id="shipping" class="font-bold text-green-600" aria-live="polite">Gratis</span>
+              </div>
+              <div class="border-t pt-4">
+                <div class="flex justify-between items-center">
+                  <span class="text-xl font-bold">Total:</span>
+                  <span id="total" class="text-3xl font-black" aria-live="polite">Q0.00</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              id="checkoutBtn"
+              class="w-full bg-[#fef24e] text-[#0061bd] px-6 py-4 rounded-lg font-black text-lg hover:bg-[#fdfad7] transition mb-4 focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2 shadow-lg"
+            >
+              Proceder al Pago
+            </button>
+
+            <a
+              href="/catalog"
+              class="block w-full text-center border-2 border-black text-black px-6 py-3 rounded-lg hover:bg-[#004a94] hover:text-white transition font-bold focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2"
+            >
+              Seguir Comprando
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    import { sileo } from 'sileo';
+
+    interface CartItem {
+      id: number;
+      shoe_id: number;
+      name: string;
+      brand: string;
+      image_url: string;
+      price: number;
+      size: string;
+      quantity: number;
+      subtotal: number;
+    }
+
+    interface CartData {
+      cart: any;
+      items: CartItem[];
+      total: number;
+      itemCount: number;
+    }
+
+    let cartData: CartData | null = null;
+
+    async function loadCart() {
+      const cartId = localStorage.getItem('cartId');
+      
+      if (!cartId) {
+        showEmptyState();
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/cart?cartId=${cartId}`);
+        const data: CartData = await response.json();
+        
+        cartData = data;
+
+        if (data.items.length === 0) {
+          showEmptyState();
+        } else {
+          renderCart(data);
+        }
+      } catch (error) {
+        console.error('Error loading cart:', error);
+        showEmptyState();
+      }
+    }
+
+    function showEmptyState() {
+      document.getElementById('loadingState')?.classList.add('hidden');
+      document.getElementById('emptyState')?.classList.remove('hidden');
+      document.getElementById('cartItems')?.classList.add('hidden');
+      document.getElementById('cartSummary')?.classList.add('hidden');
+    }
+
+    function renderCart(data: CartData) {
+      document.getElementById('loadingState')?.classList.add('hidden');
+      document.getElementById('emptyState')?.classList.add('hidden');
+      document.getElementById('cartItems')?.classList.remove('hidden');
+      document.getElementById('cartSummary')?.classList.remove('hidden');
+
+      const cartItemsContainer = document.getElementById('cartItems');
+      if (!cartItemsContainer) return;
+
+      cartItemsContainer.innerHTML = data.items.map(item => `
+        <div class="bg-white rounded-lg p-4 flex gap-4" data-item-id="${item.id}" role="listitem">
+          <img
+            src="${item.image_url}"
+            alt="${item.name}"
+            width="96"
+            height="96"
+            loading="lazy"
+            class="w-24 h-24 object-cover rounded-lg"
+          />
+          <div class="flex-1">
+            <p class="text-[#0061bd] text-sm font-bold">${item.brand}</p>
+            <h3 class="font-bold text-lg mb-1">${item.name}</h3>
+            <p class="text-sm text-gray-600 mb-2">Talla: ${item.size}</p>
+            <p class="text-xl font-black" aria-label="Precio: ${item.price.toFixed(2)} quetzales">Q${item.price.toFixed(2)}</p>
+          </div>
+          <div class="flex flex-col justify-between items-end">
+            <button
+              onclick="removeItem(${item.id})"
+              aria-label="Eliminar ${item.name} del carrito"
+              class="text-red-600 hover:text-red-800 transition focus:outline-none focus:ring-2 focus:ring-red-500 rounded p-1"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+              </svg>
+            </button>
+            <div class="flex items-center space-x-2" role="group" aria-label="Cantidad de ${item.name}">
+              <button
+                onclick="updateQuantity(${item.id}, ${item.quantity - 1})"
+                aria-label="Disminuir cantidad"
+                class="w-8 h-8 border border-black rounded hover:bg-[#004a94] hover:text-white transition focus:outline-none focus:ring-2 focus:ring-[#0061bd] disabled:opacity-50 disabled:cursor-not-allowed"
+                ${item.quantity <= 1 ? 'disabled' : ''}
+              >
+                -
+              </button>
+              <span class="font-bold w-8 text-center" aria-live="polite" aria-atomic="true">${item.quantity}</span>
+              <button
+                onclick="updateQuantity(${item.id}, ${item.quantity + 1})"
+                aria-label="Aumentar cantidad"
+                class="w-8 h-8 border border-black rounded hover:bg-[#004a94] hover:text-white transition focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+              >
+                +
+              </button>
+            </div>
+            <p class="text-lg font-black" aria-label="Subtotal: ${item.subtotal.toFixed(2)} quetzales">Q${item.subtotal.toFixed(2)}</p>
+          </div>
+        </div>
+      `).join('');
+
+      updateSummary(data.total);
+    }
+
+    function updateSummary(subtotal: number) {
+      const tax = subtotal * 0.12;
+      const total = subtotal + tax;
+
+      const subtotalEl = document.getElementById('subtotal');
+      const taxEl = document.getElementById('tax');
+      const totalEl = document.getElementById('total');
+
+      if (subtotalEl) subtotalEl.textContent = `Q${subtotal.toFixed(2)}`;
+      if (taxEl) taxEl.textContent = `Q${tax.toFixed(2)}`;
+      if (totalEl) totalEl.textContent = `Q${total.toFixed(2)}`;
+    }
+
+    async function updateQuantity(itemId: number, newQuantity: number) {
+      if (newQuantity < 1) return;
+
+      try {
+        const response = await fetch('/api/cart/items', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ itemId, quantity: newQuantity }),
+        });
+
+        if (response.ok) {
+          await loadCart();
+          window.dispatchEvent(new Event('cartUpdated'));
+        } else {
+          const data = await response.json();
+          sileo.error({ description: data.error || 'Error al actualizar cantidad' });
+        }
+      } catch (error) {
+        console.error('Error updating quantity:', error);
+        sileo.error({ description: 'Error de conexión' });
+      }
+    }
+
+    async function removeItem(itemId: number) {
+      sileo.action({
+        title: 'Confirmar eliminación',
+        description: '¿Estás seguro de eliminar este producto del carrito?',
+        duration: null,
+        button: {
+          title: 'Eliminar',
+          onClick: async () => {
+            try {
+              const response = await fetch(`/api/cart/items?itemId=${itemId}`, {
+                method: 'DELETE',
+              });
+
+              if (response.ok) {
+                await loadCart();
+                window.dispatchEvent(new Event('cartUpdated'));
+                sileo.success({ description: 'Producto eliminado del carrito' });
+              } else {
+                sileo.error({ description: 'Error al eliminar producto' });
+              }
+            } catch (error) {
+              console.error('Error removing item:', error);
+              sileo.error({ description: 'Error de conexión' });
+            }
+          }
+        }
+      });
+    }
+
+    // Make functions global
+    (window as any).updateQuantity = updateQuantity;
+    (window as any).removeItem = removeItem;
+
+    // Checkout button
+    document.getElementById('checkoutBtn')?.addEventListener('click', () => {
+      sileo.info({ description: 'Funcionalidad de checkout en desarrollo' });
+    });
+
+    // Load cart on page load
+    loadCart();
+  </script>
+</Layout>

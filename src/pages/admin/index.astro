@@ -1,0 +1,209 @@
+﻿---
+import { getSession } from '../../lib/auth';
+import { db } from '../../db';
+import { shoes, invoices, customers } from '../../db/schema';
+import { sql, desc, eq } from 'drizzle-orm';
+
+// Check authentication
+const user = await getSession(Astro.cookies);
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+// Get stats
+const [{ totalProducts }] = await db
+  .select({ totalProducts: sql<number>`count(*)` })
+  .from(shoes)
+  .where(eq(shoes.is_active, 1));
+
+const [{ totalSales }] = await db
+  .select({ totalSales: sql<number>`COALESCE(SUM(${invoices.total}), 0)` })
+  .from(invoices)
+  .where(eq(invoices.status, 'paid'));
+
+const [{ totalCustomers }] = await db
+  .select({ totalCustomers: sql<number>`count(*)` })
+  .from(customers);
+
+const [{ pendingOrders }] = await db
+  .select({ pendingOrders: sql<number>`count(*)` })
+  .from(invoices)
+  .where(eq(invoices.status, 'pending'));
+
+// Get recent invoices
+const recentInvoices = await db
+  .select()
+  .from(invoices)
+  .orderBy(desc(invoices.created_at))
+  .limit(10);
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Admin Disresa</title>
+  <link rel="stylesheet" href="/src/styles/global.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+</head>
+<body class="bg-gray-50 font-sans">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#0061bd] text-white flex flex-col">
+      <div class="p-6">
+        <img src="/logo.webp" alt="Disresa" class="h-10 mb-2" />
+        <p class="text-sm text-gray-400">Panel de Administración</p>
+      </div>
+
+      <nav class="flex-1 px-4">
+        <a href="/admin" class="flex items-center px-4 py-3 bg-[#fef24e] text-[#0061bd] rounded-lg mb-2 font-black">
+          📊 Dashboard
+        </a>
+        <a href="/admin/products" class="flex items-center px-4 py-3 hover:bg-gray-800 rounded-lg mb-2 transition">
+          👟 Productos
+        </a>
+        <a href="/admin/invoices" class="flex items-center px-4 py-3 hover:bg-gray-800 rounded-lg mb-2 transition">
+          🧾 Facturas
+        </a>
+        <a href="/admin/customers" class="flex items-center px-4 py-3 hover:bg-gray-800 rounded-lg mb-2 transition">
+          👥 Clientes
+        </a>
+      </nav>
+
+      <div class="p-4 border-t border-gray-800">
+        <div class="mb-4">
+          <p class="text-sm text-gray-400">Sesión iniciada como:</p>
+          <p class="font-bold">{user.name || user.email}</p>
+          <p class="text-xs text-[#fef24e]">{user.role}</p>
+        </div>
+        <form action="/api/auth/logout" method="POST">
+          <button
+            type="submit"
+            class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition font-bold"
+          >
+            Cerrar Sesión
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto">
+      <div class="p-8">
+        <!-- Header -->
+        <div class="mb-8">
+          <h1 class="text-4xl font-black mb-2">Dashboard</h1>
+          <p class="text-gray-600">Bienvenido de vuelta, {user.name || user.email}</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white rounded-lg shadow p-6">
+            <p class="text-gray-600 text-sm mb-2">Total Productos</p>
+            <p class="text-4xl font-black">{totalProducts}</p>
+          </div>
+          <div class="bg-white rounded-lg shadow p-6">
+            <p class="text-gray-600 text-sm mb-2">Ventas Totales</p>
+            <p class="text-4xl font-black">Q{totalSales.toFixed(2)}</p>
+          </div>
+          <div class="bg-white rounded-lg shadow p-6">
+            <p class="text-gray-600 text-sm mb-2">Total Clientes</p>
+            <p class="text-4xl font-black">{totalCustomers}</p>
+          </div>
+          <div class="bg-white rounded-lg shadow p-6">
+            <p class="text-gray-600 text-sm mb-2">Pedidos Pendientes</p>
+            <p class="text-4xl font-black">{pendingOrders}</p>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <a
+            href="/admin/products/new"
+            class="bg-[#0061bd] text-black p-6 rounded-lg hover:bg-[#004a94] transition text-center font-bold"
+          >
+            ➕ Agregar Producto
+          </a>
+          <a
+            href="/admin/invoices/new"
+            class="bg-[#0061bd] text-white p-6 rounded-lg hover:bg-gray-800 transition text-center font-bold"
+          >
+            🧾 Nueva Factura
+          </a>
+          <a
+            href="/"
+            class="border-2 border-black text-black p-6 rounded-lg hover:bg-[#004a94] hover:text-white transition text-center font-bold"
+          >
+            🏠 Ver Tienda
+          </a>
+        </div>
+
+        <!-- Recent Invoices -->
+        <div class="bg-white rounded-lg shadow">
+          <div class="p-6 border-b">
+            <h2 class="text-2xl font-black">Facturas Recientes</h2>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Número</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Cliente</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Total</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Estado</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Fecha</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                {recentInvoices.map((invoice) => (
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 font-mono text-sm">{invoice.invoice_number}</td>
+                    <td class="px-6 py-4">{invoice.customer_name}</td>
+                    <td class="px-6 py-4 font-bold">Q{invoice.total.toFixed(2)}</td>
+                    <td class="px-6 py-4">
+                      <span class={`px-3 py-1 rounded-full text-xs font-bold ${
+                        invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
+                        invoice.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        invoice.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {invoice.status}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                      {new Date(invoice.created_at).toLocaleDateString('es-GT')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Handle logout form
+    const logoutForm = document.querySelector('form[action="/api/auth/logout"]');
+    if (logoutForm) {
+      logoutForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        try {
+          const response = await fetch('/api/auth/logout', {
+            method: 'POST',
+          });
+          
+          if (response.ok) {
+            window.location.href = '/login';
+          }
+        } catch (error) {
+          console.error('Logout error:', error);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
