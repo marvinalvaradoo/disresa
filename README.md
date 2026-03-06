@@ -55,8 +55,9 @@ E-Commerce Disresa es una plataforma completa de comercio electrónico especiali
 | **Tailwind CSS** | 4.x | Estilos utility-first |
 | **Drizzle ORM** | 0.45.x | ORM type-safe |
 | **@libsql/client** | 0.17.x | Cliente SQLite/Turso |
+| **Sileo** | 0.1.5 | Sistema de notificaciones toast |
 | **SQLite** | - | Base de datos local |
-| **Vercel** | - | Plataforma de deploy |
+| **Netlify** | - | Plataforma de deploy |
 
 ## 📦 Requisitos Previos
 
@@ -261,72 +262,67 @@ ecommerce-disresa/
 | POST | `/api/auth/login` | Iniciar sesión | 🔜 Pendiente |
 | POST | `/api/auth/logout` | Cerrar sesión | 🔜 Pendiente |
 
-## 🚀 Deploy en Vercel
+## 🚀 Deploy en Netlify
 
-### Paso 1: Preparar el proyecto
+### Guía Completa
 
-Asegúrate de que el proyecto esté en un repositorio Git:
+Para instrucciones detalladas de deploy, consulta: **[DEPLOY_NETLIFY.md](./DEPLOY_NETLIFY.md)**
 
+### Resumen Rápido
+
+1. **Instalar adaptador:**
 ```bash
-git add .
-git commit -m "Initial commit"
-git push origin main
+npm install @astrojs/netlify
 ```
 
-### Paso 2: Crear cuenta en Turso (Base de datos producción)
-
+2. **Configurar Turso:**
 ```bash
-# Instalar Turso CLI
-npm install -g @turso/cli
-
-# Autenticarse
-turso auth login
-
-# Crear base de datos
 turso db create marvinbd-prod
-
-# Obtener URL de conexión
 turso db show marvinbd-prod --url
-
-# Crear token de autenticación
 turso db tokens create marvinbd-prod
 ```
 
-### Paso 3: Configurar Vercel
-
-1. Ve a [vercel.com](https://vercel.com) e inicia sesión
-2. Click en "Add New Project"
-3. Importa tu repositorio de GitHub
-4. Configura las variables de entorno:
-   - `TURSO_DATABASE_URL`: URL obtenida de Turso
-   - `TURSO_AUTH_TOKEN`: Token obtenido de Turso
-
-### Paso 4: Deploy
-
+3. **Push a GitHub:**
 ```bash
-# Instalar Vercel CLI (opcional)
-npm install -g vercel
-
-# Deploy desde CLI
-vercel
-
-# O simplemente push a main para auto-deploy
 git push origin main
 ```
 
-### Paso 5: Migrar la base de datos en producción
+4. **Deploy en Netlify:**
+   - Importar proyecto desde GitHub
+   - Configurar variables de entorno
+   - Deploy automático
 
-```bash
-# Configurar .env con credenciales de producción
-TURSO_DATABASE_URL=libsql://marvinbd-prod.turso.io
-TURSO_AUTH_TOKEN=tu-token-aqui
+### Variables de Entorno en Netlify
 
-# Aplicar schema
-npm run db:push
+| Variable | Descripción |
+|----------|-------------|
+| `TURSO_DATABASE_URL` | URL de base de datos Turso |
+| `TURSO_AUTH_TOKEN` | Token de autenticación |
+| `JWT_SECRET` | Secret para JWT |
+| `NODE_ENV` | `production` |
 
-# Insertar datos iniciales
-npm run db:seed
-```
+---
+
+## 🔔 Sistema de Notificaciones
+
+El proyecto usa **Sileo** para notificaciones toast modernas:
+
+- ✅ Notificaciones de éxito (verde)
+- ❌ Notificaciones de error (rojo)
+- ⚠️ Notificaciones de advertencia (amarillo)
+- ℹ️ Notificaciones de información (azul)
+- 🔘 Confirmaciones con botones
+
+**Características:**
+- Fondo negro personalizado
+- Texto amarillo/blanco (colores de marca)
+- Animaciones fluidas
+- Posicionamiento inteligente
+- Reemplaza `alert()` y `confirm()` del navegador
+
+Para más detalles, consulta: **[SILEO_USAGE.md](./SILEO_USAGE.md)**
+
+---
 
 ## 🔑 Credenciales de Prueba
 
@@ -384,7 +380,16 @@ export const GET: APIRoute = async () => {
 - **React islands** se usan solo para componentes interactivos
 - **Drizzle ORM** proporciona type-safety completo en las queries
 - **@libsql/client** es compatible tanto con SQLite local como Turso en producción
-- El adaptador **Vercel serverless** optimiza el deploy para funciones edge
+- El adaptador **Netlify** optimiza el deploy para funciones serverless
+- **Sileo** reemplaza todos los `alert()` y `confirm()` nativos del navegador
+
+## 📚 Documentación Adicional
+
+- **[documentation.md](./documentation.md)** - Documentación técnica completa
+- **[DEPLOY_NETLIFY.md](./DEPLOY_NETLIFY.md)** - Guía de deploy en Netlify
+- **[SILEO_USAGE.md](./SILEO_USAGE.md)** - Guía de uso de notificaciones Sileo
+- **[ACCESSIBILITY_CHECKLIST.md](./ACCESSIBILITY_CHECKLIST.md)** - Checklist de accesibilidad
+- **[ADMIN_PRODUCTS_GUIDE.md](./ADMIN_PRODUCTS_GUIDE.md)** - Guía del panel de administración
 
 ## 🤝 Contribución
 

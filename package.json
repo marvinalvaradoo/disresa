@@ -14,19 +14,26 @@
     "db:seed": "npx tsx src/db/seed.ts"
   },
   "dependencies": {
+    "@astrojs/netlify": "^6.6.4",
     "@astrojs/react": "^4.4.2",
     "@astrojs/vercel": "^9.0.4",
+    "@heroicons/react": "^2.2.0",
     "@libsql/client": "^0.17.0",
     "@tailwindcss/vite": "^4.2.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "astro": "^5.17.1",
+    "bcryptjs": "^3.0.3",
+    "cookie": "^1.1.1",
     "drizzle-orm": "^0.45.1",
+    "jose": "^6.2.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "sileo": "^0.1.5",
     "tailwindcss": "^4.2.1"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "dotenv": "^17.3.1",
     "drizzle-kit": "^0.31.9",
     "tsx": "^4.21.0"

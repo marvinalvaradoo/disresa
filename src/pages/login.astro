@@ -1,0 +1,146 @@
+﻿---
+import Layout from '../layouts/Layout.astro';
+import { getSession } from '../lib/auth';
+
+// Redirect if already logged in
+const user = await getSession(Astro.cookies);
+if (user) {
+  return Astro.redirect('/admin');
+}
+---
+
+<Layout title="Iniciar Sesión - Disresa">
+  <div class="min-h-screen bg-gradient-to-br from-black to-gray-900 flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full">
+      <!-- Logo -->
+      <div class="text-center mb-8">
+        <img src="/logo.webp" alt="Disresa Logo" class="h-16 mx-auto mb-4" width="192" height="64" />
+        <h1 class="text-3xl font-black text-white mb-2">Iniciar Sesión</h1>
+        <p class="text-gray-400">Accede al panel de administración</p>
+      </div>
+
+      <!-- Login Form -->
+      <div class="bg-white rounded-lg shadow-xl p-8">
+        <form id="loginForm" class="space-y-6" novalidate>
+          <!-- Email -->
+          <div>
+            <label for="email" class="block text-sm font-bold mb-2">
+              Correo Electrónico
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              autocomplete="email"
+              aria-required="true"
+              aria-describedby="email-error"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+              placeholder="admin@disresa.com"
+            />
+            <span id="email-error" class="sr-only"></span>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password" class="block text-sm font-bold mb-2">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              autocomplete="current-password"
+              aria-required="true"
+              aria-describedby="password-error"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+              placeholder="••••••••"
+            />
+            <span id="password-error" class="sr-only"></span>
+          </div>
+
+          <!-- Error Message -->
+          <div id="errorMessage" role="alert" aria-live="assertive" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            id="submitBtn"
+            aria-busy="false"
+            class="w-full bg-[#fef24e] text-[#0061bd] font-black py-3 rounded-lg hover:bg-[#fdfad7] transition focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+          >
+            Iniciar Sesión
+          </button>
+        </form>
+
+        <!-- Demo Credentials -->
+        <div class="mt-6 p-4 bg-gray-50 rounded-lg" role="note" aria-label="Credenciales de prueba">
+          <p class="text-sm text-gray-600 mb-2 font-bold">Credenciales de prueba:</p>
+          <p class="text-sm text-gray-600">Email: admin@disresa.com</p>
+          <p class="text-sm text-gray-600">Password: Disresa2024!</p>
+        </div>
+      </div>
+
+      <!-- Back to Home -->
+      <div class="text-center mt-6">
+        <a href="/" class="text-gray-400 hover:text-white transition focus:outline-none focus:ring-2 focus:ring-white rounded px-2 py-1">
+          ← Volver al inicio
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm') as HTMLFormElement;
+    const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
+    const errorMessage = document.getElementById('errorMessage') as HTMLDivElement;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const email = formData.get('email') as string;
+      const password = formData.get('password') as string;
+
+      // Hide error message
+      errorMessage.classList.add('hidden');
+
+      // Disable button
+      submitBtn.disabled = true;
+      submitBtn.setAttribute('aria-busy', 'true');
+      submitBtn.textContent = 'Iniciando sesión...';
+
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Redirect to admin
+          window.location.href = '/admin';
+        } else {
+          // Show error
+          errorMessage.textContent = data.error || 'Error al iniciar sesión';
+          errorMessage.classList.remove('hidden');
+          submitBtn.disabled = false;
+          submitBtn.setAttribute('aria-busy', 'false');
+          submitBtn.textContent = 'Iniciar Sesión';
+        }
+      } catch (error) {
+        errorMessage.textContent = 'Error de conexión. Intenta de nuevo.';
+        errorMessage.classList.remove('hidden');
+        submitBtn.disabled = false;
+        submitBtn.setAttribute('aria-busy', 'false');
+        submitBtn.textContent = 'Iniciar Sesión';
+      }
+    });
+  </script>
+</Layout>

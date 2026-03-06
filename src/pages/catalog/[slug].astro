@@ -1,0 +1,214 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AddToCartButton from '../../components/react/AddToCartButton';
+import { db } from '../../db';
+import { shoes, brands, categories } from '../../db/schema';
+import { eq } from 'drizzle-orm';
+
+const { slug } = Astro.params;
+
+// Get product by slug
+const [result] = await db
+  .select({
+    shoe: shoes,
+    brand: brands,
+    category: categories,
+  })
+  .from(shoes)
+  .leftJoin(brands, eq(shoes.brand_id, brands.id))
+  .leftJoin(categories, eq(shoes.category_id, categories.id))
+  .where(eq(shoes.slug, slug!))
+  .limit(1);
+
+if (!result) {
+  return Astro.redirect('/catalog');
+}
+
+const shoe = {
+  ...result.shoe,
+  brand: result.brand,
+  category: result.category,
+  sizes: JSON.parse(result.shoe.sizes),
+  images: result.shoe.images ? JSON.parse(result.shoe.images) : [],
+  features: result.shoe.features ? JSON.parse(result.shoe.features) : [],
+};
+
+// Get related products
+const relatedProducts = await db
+  .select({
+    shoe: shoes,
+    brand: brands,
+  })
+  .from(shoes)
+  .leftJoin(brands, eq(shoes.brand_id, brands.id))
+  .where(eq(shoes.category_id, result.shoe.category_id))
+  .limit(5);
+
+const related = relatedProducts
+  .filter((p) => p.shoe.id !== shoe.id)
+  .slice(0, 4)
+  .map(({ shoe: s, brand }) => ({
+    ...s,
+    brand,
+    sizes: JSON.parse(s.sizes),
+  }));
+
+const allImages = [shoe.image_url, ...shoe.images].filter(Boolean);
+---
+
+<Layout title={`${shoe.name} - Disresa`} description={shoe.description || ''}>
+  <div class="bg-white py-8">
+    <div class="container mx-auto px-4">
+      <!-- Breadcrumb -->
+      <nav class="mb-6 text-sm" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2">
+          <li><a href="/" class="text-gray-600 hover:text-black focus:outline-none focus:ring-2 focus:ring-[#3B82F6] rounded px-1">Inicio</a></li>
+          <li aria-hidden="true"><span class="mx-2 text-gray-400">/</span></li>
+          <li><a href="/catalog" class="text-gray-600 hover:text-black focus:outline-none focus:ring-2 focus:ring-[#3B82F6] rounded px-1">Catálogo</a></li>
+          <li aria-hidden="true"><span class="mx-2 text-gray-400">/</span></li>
+          <li aria-current="page"><span class="text-black font-bold">{shoe.name}</span></li>
+        </ol>
+      </nav>
+
+      <!-- Product Detail -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+        <!-- Images -->
+        <div>
+          <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4" style="min-height: 400px;">
+            <img
+              id="mainImage"
+              src={allImages[0]}
+              alt={shoe.name}
+              width="600"
+              height="600"
+              loading="eager"
+              fetchpriority="high"
+              class="w-full h-full object-cover"
+            />
+          </div>
+          
+          {allImages.length > 1 && (
+            <div class="grid grid-cols-4 gap-4" role="list" aria-label="Galería de imágenes del producto">
+              {allImages.map((img, index) => (
+                <button
+                  role="listitem"
+                  aria-label={`Ver imagen ${index + 1} de ${allImages.length}`}
+                  class="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-transparent hover:border-black transition focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:ring-offset-2"
+                  onclick={`document.getElementById('mainImage').src='${img}'; document.getElementById('mainImage').alt='${shoe.name} - Imagen ${index + 1}';`}
+                >
+                  <img 
+                    src={img} 
+                    alt={`${shoe.name} miniatura ${index + 1}`} 
+                    width="150" 
+                    height="150"
+                    loading="lazy"
+                    class="w-full h-full object-cover" 
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <!-- Product Info -->
+        <div>
+          <p class="text-[#3B82F6] text-sm font-bold mb-2" aria-label={`Marca: ${shoe.brand?.name}`}>{shoe.brand?.name}</p>
+          <h1 class="text-4xl font-black mb-4">{shoe.name}</h1>
+          
+          <div class="flex items-center gap-4 mb-6" role="group" aria-label="Información de precio">
+            <p class="text-4xl font-black" aria-label={`Precio actual: ${shoe.price.toFixed(2)} quetzales`}>Q{shoe.price.toFixed(2)}</p>
+            {shoe.original_price && shoe.original_price > shoe.price && (
+              <>
+                <p class="text-2xl text-gray-400 line-through" aria-label={`Precio original: ${shoe.original_price.toFixed(2)} quetzales`}>Q{shoe.original_price.toFixed(2)}</p>
+                <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold" aria-label={`Descuento del ${Math.round(((shoe.original_price - shoe.price) / shoe.price) * 100)} por ciento`}>
+                  -{Math.round(((shoe.original_price - shoe.price) / shoe.price) * 100)}% OFF
+                </span>
+              </>
+            )}
+          </div>
+
+          {shoe.description && (
+            <p class="text-gray-700 mb-6 leading-relaxed">{shoe.description}</p>
+          )}
+
+          <!-- Add to Cart Component -->
+          <AddToCartButton
+            client:load
+            shoeId={shoe.id}
+            shoeName={shoe.name}
+            price={shoe.price}
+            availableSizes={shoe.sizes}
+            stock={shoe.stock}
+          />
+
+          <!-- Features -->
+          {shoe.features.length > 0 && (
+            <div class="mb-6">
+              <h3 class="font-bold mb-3">Características:</h3>
+              <ul class="space-y-2" role="list">
+                {shoe.features.map((feature: string) => (
+                  <li class="flex items-start" role="listitem">
+                    <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <!-- Shipping Info -->
+          <div class="bg-gray-50 rounded-lg p-4 mb-6" role="region" aria-label="Información de envío">
+            <p class="text-sm flex items-center gap-2">
+              <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+              </svg>
+              <span><strong>Envío:</strong> Gratis en compras mayores a Q500</span>
+            </p>
+            <p class="text-sm mt-2 flex items-center gap-2">
+              <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+              </svg>
+              <span><strong>Entrega:</strong> 3-5 días hábiles</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Related Products -->
+      {related.length > 0 && (
+        <section aria-labelledby="related-heading">
+          <h2 id="related-heading" class="text-3xl font-black mb-8">Productos Relacionados</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {related.map((product) => (
+              <article class="flex">
+                <a
+                  href={`/catalog/${product.slug}`}
+                  class="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:ring-offset-2 flex flex-col w-full"
+                  aria-label={`Ver detalles de ${product.name}`}
+                >
+                  <div class="aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      width="300"
+                      height="300"
+                      loading="lazy"
+                      class="w-full h-full object-cover group-hover:scale-110 transition duration-300"
+                    />
+                  </div>
+                  <div class="p-4 flex flex-col flex-grow">
+                    <p class="text-[#3B82F6] text-sm font-bold mb-1">{product.brand?.name}</p>
+                    <h3 class="font-bold text-lg mb-2 line-clamp-2 min-h-[3.5rem]">{product.name}</h3>
+                    <p class="text-2xl font-black mt-auto" aria-label={`Precio: ${product.price.toFixed(2)} quetzales`}>Q{product.price.toFixed(2)}</p>
+                  </div>
+                </a>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  </div>
+</Layout>

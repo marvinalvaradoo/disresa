@@ -1,0 +1,244 @@
+﻿---
+import Layout from '../../layouts/Layout.astro';
+import { db } from '../../db';
+import { shoes, brands, categories } from '../../db/schema';
+import { eq, and, like, desc, sql } from 'drizzle-orm';
+
+const url = Astro.url;
+const categorySlug = url.searchParams.get('category');
+const brandSlug = url.searchParams.get('brand');
+const search = url.searchParams.get('search');
+const featured = url.searchParams.get('featured');
+
+// Build query conditions
+const conditions = [eq(shoes.is_active, 1)];
+
+if (categorySlug) {
+  const [cat] = await db.select().from(categories).where(eq(categories.slug, categorySlug)).limit(1);
+  if (cat) {
+    conditions.push(eq(shoes.category_id, cat.id));
+  }
+}
+
+if (brandSlug) {
+  const [br] = await db.select().from(brands).where(eq(brands.slug, brandSlug)).limit(1);
+  if (br) {
+    conditions.push(eq(shoes.brand_id, br.id));
+  }
+}
+
+if (search) {
+  conditions.push(
+    sql`${shoes.name} LIKE ${`%${search}%`} OR ${shoes.description} LIKE ${`%${search}%`}`
+  );
+}
+
+if (featured === 'true') {
+  conditions.push(eq(shoes.is_featured, 1));
+}
+
+// Get filtered shoes
+const results = await db
+  .select({
+    shoe: shoes,
+    brand: brands,
+    category: categories,
+  })
+  .from(shoes)
+  .leftJoin(brands, eq(shoes.brand_id, brands.id))
+  .leftJoin(categories, eq(shoes.category_id, categories.id))
+  .where(and(...conditions))
+  .orderBy(desc(shoes.created_at));
+
+const formattedShoes = results.map(({ shoe, brand, category }) => ({
+  ...shoe,
+  brand,
+  category,
+  sizes: JSON.parse(shoe.sizes),
+}));
+
+// Get all categories and brands for filters
+const allCategories = await db.select().from(categories);
+const allBrands = await db.select().from(brands);
+---
+
+<Layout title="Catálogo - Disresa">
+  <div class="bg-gray-50 min-h-screen py-8">
+    <div class="container mx-auto px-4">
+      <!-- Breadcrumb -->
+      <nav class="mb-6 text-sm" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2">
+          <li><a href="/" class="text-gray-600 hover:text-black focus:outline-none focus:ring-2 focus:ring-[#0061bd] rounded px-1">Inicio</a></li>
+          <li aria-hidden="true"><span class="mx-2 text-gray-400">/</span></li>
+          <li aria-current="page"><span class="text-black font-bold">Catálogo</span></li>
+        </ol>
+      </nav>
+
+      <!-- Page Title -->
+      <div class="mb-8">
+        <h1 class="text-4xl font-black mb-2">
+          {featured === 'true' ? 'Productos Destacados' : 'Catálogo de Productos'}
+        </h1>
+        <p class="text-gray-600">{formattedShoes.length} productos encontrados</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Sidebar Filters -->
+        <aside class="lg:col-span-1" aria-label="Filtros de productos">
+          <div class="bg-white rounded-lg p-6 sticky top-24">
+            <h2 class="font-bold text-xl mb-4">Filtros</h2>
+
+            <!-- Search -->
+            <div class="mb-6">
+              <label for="search-input" class="block text-sm font-bold mb-2">Buscar</label>
+              <form method="get" action="/catalog" role="search">
+                <input
+                  type="search"
+                  id="search-input"
+                  name="search"
+                  value={search || ''}
+                  placeholder="Buscar productos..."
+                  aria-label="Buscar productos"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+                />
+                <button
+                  type="submit"
+                  class="w-full mt-2 bg-[#0061bd] text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2"
+                >
+                  Buscar
+                </button>
+              </form>
+            </div>
+
+            <!-- Categories -->
+            {allCategories.length > 0 && (
+              <nav class="mb-6" aria-label="Filtrar por categoría">
+                <h3 class="font-bold mb-3">Categorías</h3>
+                <div class="space-y-2" role="list">
+                  <a
+                    href="/catalog"
+                    role="listitem"
+                    aria-current={!categorySlug ? 'page' : undefined}
+                    class={`block px-3 py-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2 ${!categorySlug ? 'bg-[#0061bd] text-white' : 'hover:bg-gray-100'}`}
+                  >
+                    Todas
+                  </a>
+                  {allCategories.map((cat) => (
+                    <a
+                      href={`/catalog?category=${cat.slug}`}
+                      role="listitem"
+                      aria-current={categorySlug === cat.slug ? 'page' : undefined}
+                      class={`block px-3 py-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2 ${categorySlug === cat.slug ? 'bg-[#0061bd] text-white' : 'hover:bg-gray-100'}`}
+                    >
+                      {cat.name}
+                    </a>
+                  ))}
+                </div>
+              </nav>
+            )}
+
+            <!-- Brands -->
+            {allBrands.length > 0 && (
+              <nav class="mb-6" aria-label="Filtrar por marca">
+                <h3 class="font-bold mb-3">Marcas</h3>
+                <div class="space-y-2" role="list">
+                  <a
+                    href="/catalog"
+                    role="listitem"
+                    aria-current={!brandSlug ? 'page' : undefined}
+                    class={`block px-3 py-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2 ${!brandSlug ? 'bg-[#0061bd] text-white' : 'hover:bg-gray-100'}`}
+                  >
+                    Todas
+                  </a>
+                  {allBrands.map((brand) => (
+                    <a
+                      href={`/catalog?brand=${brand.slug}`}
+                      role="listitem"
+                      aria-current={brandSlug === brand.slug ? 'page' : undefined}
+                      class={`block px-3 py-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2 ${brandSlug === brand.slug ? 'bg-[#0061bd] text-white' : 'hover:bg-gray-100'}`}
+                    >
+                      {brand.name}
+                    </a>
+                  ))}
+                </div>
+              </nav>
+            )}
+
+            <!-- Clear Filters -->
+            {(categorySlug || brandSlug || search || featured) && (
+              <a
+                href="/catalog"
+                class="block w-full text-center px-4 py-2 border-2 border-black text-black rounded-lg hover:bg-[#004a94] hover:text-white transition font-bold focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2"
+              >
+                Limpiar Filtros
+              </a>
+            )}
+          </div>
+        </aside>
+
+        <!-- Products Grid -->
+        <div class="lg:col-span-3">
+          {formattedShoes.length === 0 ? (
+            <div class="bg-white rounded-lg p-12 text-center" role="status" aria-live="polite">
+              <div class="text-6xl mb-4" aria-hidden="true">😔</div>
+              <h3 class="text-2xl font-bold mb-2">No se encontraron productos</h3>
+              <p class="text-gray-600 mb-6">Intenta ajustar tus filtros o buscar algo diferente</p>
+              <a
+                href="/catalog"
+                class="inline-block bg-[#0061bd] text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition font-bold focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2"
+              >
+                Ver Todos los Productos
+              </a>
+            </div>
+          ) : (
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="list" aria-label="Lista de productos">
+              {formattedShoes.map((shoe) => (
+                <article role="listitem" class="flex">
+                  <a
+                    href={`/catalog/${shoe.slug}`}
+                    class="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2 flex flex-col w-full"
+                    aria-label={`Ver detalles de ${shoe.name}`}
+                  >
+                    <div class="aspect-square overflow-hidden bg-gray-100 relative flex-shrink-0">
+                      <img
+                        src={shoe.image_url}
+                        alt={shoe.name}
+                        width="400"
+                        height="400"
+                        loading="lazy"
+                        class="w-full h-full object-cover group-hover:scale-110 transition duration-300"
+                      />
+                      {shoe.original_price && shoe.original_price > shoe.price && (
+                        <div class="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold" aria-label={`Descuento del ${Math.round(((shoe.original_price - shoe.price) / shoe.original_price) * 100)} por ciento`}>
+                          -{Math.round(((shoe.original_price - shoe.price) / shoe.original_price) * 100)}%
+                        </div>
+                      )}
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow">
+                      <p class="text-[#0061bd] text-sm font-bold mb-1">{shoe.brand?.name}</p>
+                      <h3 class="font-bold text-lg mb-2 line-clamp-2 min-h-[3.5rem]">{shoe.name}</h3>
+                      <div class="flex items-center gap-2 mb-3 flex-wrap min-h-[2rem]" role="list" aria-label="Tallas disponibles">
+                        {shoe.sizes.slice(0, 4).map((size: string) => (
+                          <span class="text-xs bg-gray-100 px-2 py-1 rounded" role="listitem">{size}</span>
+                        ))}
+                        {shoe.sizes.length > 4 && (
+                          <span class="text-xs text-gray-500" aria-label={`${shoe.sizes.length - 4} tallas más disponibles`}>+{shoe.sizes.length - 4}</span>
+                        )}
+                      </div>
+                      <div class="flex items-center gap-2 mt-auto">
+                        <p class="text-2xl font-black" aria-label={`Precio: ${shoe.price.toFixed(2)} quetzales`}>Q{shoe.price.toFixed(2)}</p>
+                        {shoe.original_price && shoe.original_price > shoe.price && (
+                          <p class="text-gray-400 line-through text-sm" aria-label={`Precio original: ${shoe.original_price.toFixed(2)} quetzales`}>Q{shoe.original_price.toFixed(2)}</p>
+                        )}
+                      </div>
+                    </div>
+                  </a>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
