@@ -3,11 +3,23 @@ import Layout from '../layouts/Layout.astro';
 import { db } from '../db';
 import { shoes, brands, categories } from '../db/schema';
 import { eq } from 'drizzle-orm';
+import type { InferSelectModel } from 'drizzle-orm';
 
-let featuredShoes = [];
-let allCategories = [];
-let allBrands = [];
-let formattedShoes = [];
+type Shoe = InferSelectModel<typeof shoes>;
+type Brand = InferSelectModel<typeof brands>;
+type Category = InferSelectModel<typeof categories>;
+
+interface FormattedShoe extends Omit<Shoe, 'sizes' | 'images'> {
+  brand: Brand | null;
+  category: Category | null;
+  sizes: string[];
+  images: string[];
+}
+
+let featuredShoes: Array<{ shoe: Shoe; brand: Brand | null; category: Category | null }> = [];
+let allCategories: Category[] = [];
+let allBrands: Brand[] = [];
+let formattedShoes: FormattedShoe[] = [];
 
 try {
   // Get featured products
