@@ -1,0 +1,549 @@
+---
+import { getSession } from '../../lib/auth';
+import { db } from '../../db';
+import { invoices, customers, users } from '../../db/schema';
+import { eq, desc } from 'drizzle-orm';
+
+// Check authentication
+const user = await getSession(Astro.cookies);
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+// Get all invoices with customer info
+const allInvoices = await db
+  .select({
+    invoice: invoices,
+    customer: customers,
+    creator: users,
+  })
+  .from(invoices)
+  .leftJoin(customers, eq(invoices.customer_id, customers.id))
+  .leftJoin(users, eq(invoices.created_by, users.id))
+  .orderBy(desc(invoices.created_at));
+
+// Get all customers for the form
+const allCustomers = await db.select().from(customers);
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facturas - Admin Disresa</title>
+  <link rel="stylesheet" href="/src/styles/global.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+</head>
+<body class="bg-gray-50 font-sans">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#0061bd] text-white flex flex-col">
+      <div class="p-6">
+        <img src="/logo.webp" alt="Disresa" class="h-10 mb-2" />
+        <p class="text-sm text-gray-400">Panel de Administración</p>
+      </div>
+
+      <nav class="flex-1 px-4">
+        <a href="/admin" class="flex items-center px-4 py-3 hover:bg-gray-800 rounded-lg mb-2 transition">
+          📊 Dashboard
+        </a>
+        <a href="/admin/products" class="flex items-center px-4 py-3 hover:bg-gray-800 rounded-lg mb-2 transition">
+          👟 Productos
+        </a>
+        <a href="/admin/invoices" class="flex items-center px-4 py-3 bg-[#fef24e] text-[#0061bd] rounded-lg mb-2 font-black">
+          🧾 Facturas
+        </a>
+        <a href="/admin/customers" class="flex items-center px-4 py-3 hover:bg-gray-800 rounded-lg mb-2 transition">
+          👥 Clientes
+        </a>
+      </nav>
+
+      <div class="p-4 border-t border-gray-800">
+        <div class="mb-4">
+          <p class="text-sm text-gray-400">Sesión iniciada como:</p>
+          <p class="font-bold">{user.name || user.email}</p>
+          <p class="text-xs text-[#fef24e]">{user.role}</p>
+        </div>
+        <form action="/api/auth/logout" method="POST">
+          <button
+            type="submit"
+            class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition font-bold"
+          >
+            Cerrar Sesión
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto">
+      <div class="p-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+          <div>
+            <h1 class="text-4xl font-black mb-2">Facturas</h1>
+            <p class="text-gray-600">{allInvoices.length} facturas en total</p>
+          </div>
+          <button
+            id="openModalBtn"
+            class="bg-[#fef24e] text-[#0061bd] px-6 py-3 rounded-lg font-black hover:bg-[#fdfad7] transition shadow-lg"
+          >
+            ➕ Nueva Factura
+          </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white p-6 rounded-lg shadow">
+            <p class="text-gray-600 text-sm mb-2">Total Facturas</p>
+            <p class="text-3xl font-black">{allInvoices.length}</p>
+          </div>
+          <div class="bg-green-50 p-6 rounded-lg shadow">
+            <p class="text-gray-600 text-sm mb-2">Pagadas</p>
+            <p class="text-3xl font-black text-green-600">
+              {allInvoices.filter(i => i.invoice.status === 'paid').length}
+            </p>
+          </div>
+          <div class="bg-yellow-50 p-6 rounded-lg shadow">
+            <p class="text-gray-600 text-sm mb-2">Pendientes</p>
+            <p class="text-3xl font-black text-yellow-600">
+              {allInvoices.filter(i => i.invoice.status === 'pending').length}
+            </p>
+          </div>
+          <div class="bg-blue-50 p-6 rounded-lg shadow">
+            <p class="text-gray-600 text-sm mb-2">Total Ingresos</p>
+            <p class="text-3xl font-black text-blue-600">
+              Q{allInvoices.filter(i => i.invoice.status === 'paid').reduce((sum, i) => sum + i.invoice.total, 0).toFixed(2)}
+            </p>
+          </div>
+        </div>
+
+        <!-- Invoices Table -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Número</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Cliente</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Fecha</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Subtotal</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Impuesto</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Total</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Estado</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                {allInvoices.map(({ invoice, customer, creator }) => (
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4">
+                      <p class="font-bold">{invoice.invoice_number}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                      <p class="font-bold">{invoice.customer_name}</p>
+                      <p class="text-sm text-gray-500">{invoice.customer_email}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                      <p class="text-sm">
+                        {new Date(invoice.created_at).toLocaleDateString('es-GT', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </td>
+                    <td class="px-6 py-4">Q{invoice.subtotal.toFixed(2)}</td>
+                    <td class="px-6 py-4">Q{invoice.tax.toFixed(2)}</td>
+                    <td class="px-6 py-4">
+                      <p class="font-bold text-lg">Q{invoice.total.toFixed(2)}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                      <span class={`px-3 py-1 rounded-full text-xs font-bold ${
+                        invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
+                        invoice.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        invoice.status === 'cancelled' ? 'bg-gray-100 text-gray-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {invoice.status === 'paid' ? 'Pagada' :
+                         invoice.status === 'pending' ? 'Pendiente' :
+                         invoice.status === 'cancelled' ? 'Cancelada' :
+                         'Reembolsada'}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="flex gap-2">
+                        <button
+                          class="view-btn text-blue-600 hover:text-blue-800 font-bold"
+                          data-invoice={JSON.stringify(invoice)}
+                        >
+                          👁️ Ver
+                        </button>
+                        <button
+                          class="edit-btn text-green-600 hover:text-green-800 font-bold"
+                          data-invoice={JSON.stringify(invoice)}
+                        >
+                          ✏️ Editar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Invoice Modal -->
+  <div id="invoiceModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
+        <h2 id="modalTitle" class="text-2xl font-black">Nueva Factura</h2>
+        <button id="closeModalBtn" class="text-gray-500 hover:text-black text-2xl">×</button>
+      </div>
+
+      <form id="invoiceForm" class="p-6">
+        <input type="hidden" id="invoiceId" name="id" />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Invoice Number -->
+          <div>
+            <label for="invoice_number" class="block font-bold mb-2">Número de Factura *</label>
+            <input
+              type="text"
+              id="invoice_number"
+              name="invoice_number"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+              placeholder="INV-001"
+            />
+          </div>
+
+          <!-- Customer -->
+          <div>
+            <label for="customer_id" class="block font-bold mb-2">Cliente</label>
+            <select
+              id="customer_id"
+              name="customer_id"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+            >
+              <option value="">Cliente nuevo</option>
+              {allCustomers.map((customer) => (
+                <option value={customer.id} data-name={customer.name} data-email={customer.email}>
+                  {customer.name} - {customer.email}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <!-- Customer Name -->
+          <div>
+            <label for="customer_name" class="block font-bold mb-2">Nombre del Cliente *</label>
+            <input
+              type="text"
+              id="customer_name"
+              name="customer_name"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+              placeholder="Juan Pérez"
+            />
+          </div>
+
+          <!-- Customer Email -->
+          <div>
+            <label for="customer_email" class="block font-bold mb-2">Email del Cliente *</label>
+            <input
+              type="email"
+              id="customer_email"
+              name="customer_email"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+              placeholder="cliente@example.com"
+            />
+          </div>
+
+          <!-- Subtotal -->
+          <div>
+            <label for="subtotal" class="block font-bold mb-2">Subtotal *</label>
+            <input
+              type="number"
+              id="subtotal"
+              name="subtotal"
+              required
+              step="0.01"
+              min="0"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+              placeholder="0.00"
+            />
+          </div>
+
+          <!-- Tax -->
+          <div>
+            <label for="tax" class="block font-bold mb-2">Impuesto</label>
+            <input
+              type="number"
+              id="tax"
+              name="tax"
+              step="0.01"
+              min="0"
+              value="0"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+              placeholder="0.00"
+            />
+          </div>
+
+          <!-- Discount -->
+          <div>
+            <label for="discount" class="block font-bold mb-2">Descuento</label>
+            <input
+              type="number"
+              id="discount"
+              name="discount"
+              step="0.01"
+              min="0"
+              value="0"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+              placeholder="0.00"
+            />
+          </div>
+
+          <!-- Total -->
+          <div>
+            <label for="total" class="block font-bold mb-2">Total *</label>
+            <input
+              type="number"
+              id="total"
+              name="total"
+              required
+              step="0.01"
+              min="0"
+              readonly
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+              placeholder="0.00"
+            />
+          </div>
+
+          <!-- Status -->
+          <div class="md:col-span-2">
+            <label for="status" class="block font-bold mb-2">Estado *</label>
+            <select
+              id="status"
+              name="status"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+            >
+              <option value="pending">Pendiente</option>
+              <option value="paid">Pagada</option>
+              <option value="cancelled">Cancelada</option>
+              <option value="refunded">Reembolsada</option>
+            </select>
+          </div>
+
+          <!-- Notes -->
+          <div class="md:col-span-2">
+            <label for="notes" class="block font-bold mb-2">Notas</label>
+            <textarea
+              id="notes"
+              name="notes"
+              rows="3"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+              placeholder="Notas adicionales..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="flex gap-4 mt-6">
+          <button
+            type="submit"
+            class="flex-1 bg-[#fef24e] text-[#0061bd] px-6 py-3 rounded-lg font-black hover:bg-[#fdfad7] transition shadow-lg"
+          >
+            Guardar Factura
+          </button>
+          <button
+            type="button"
+            id="cancelBtn"
+            class="px-6 py-3 border-2 border-[#0061bd] text-[#0061bd] rounded-lg font-bold hover:bg-[#0061bd] hover:text-white transition"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    import { sileo } from 'sileo';
+
+    const modal = document.getElementById('invoiceModal');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const invoiceForm = document.getElementById('invoiceForm') as HTMLFormElement;
+    const modalTitle = document.getElementById('modalTitle');
+
+    // Customer selection auto-fill
+    const customerSelect = document.getElementById('customer_id') as HTMLSelectElement;
+    const customerNameInput = document.getElementById('customer_name') as HTMLInputElement;
+    const customerEmailInput = document.getElementById('customer_email') as HTMLInputElement;
+
+    customerSelect?.addEventListener('change', () => {
+      const selectedOption = customerSelect.options[customerSelect.selectedIndex];
+      if (selectedOption.value) {
+        customerNameInput.value = selectedOption.getAttribute('data-name') || '';
+        customerEmailInput.value = selectedOption.getAttribute('data-email') || '';
+      } else {
+        customerNameInput.value = '';
+        customerEmailInput.value = '';
+      }
+    });
+
+    // Auto-calculate total
+    const subtotalInput = document.getElementById('subtotal') as HTMLInputElement;
+    const taxInput = document.getElementById('tax') as HTMLInputElement;
+    const discountInput = document.getElementById('discount') as HTMLInputElement;
+    const totalInput = document.getElementById('total') as HTMLInputElement;
+
+    const calculateTotal = () => {
+      const subtotal = parseFloat(subtotalInput?.value || '0');
+      const tax = parseFloat(taxInput?.value || '0');
+      const discount = parseFloat(discountInput?.value || '0');
+      const total = subtotal + tax - discount;
+      if (totalInput) totalInput.value = total.toFixed(2);
+    };
+
+    subtotalInput?.addEventListener('input', calculateTotal);
+    taxInput?.addEventListener('input', calculateTotal);
+    discountInput?.addEventListener('input', calculateTotal);
+
+    // Open modal for new invoice
+    openModalBtn?.addEventListener('click', () => {
+      if (modalTitle) modalTitle.textContent = 'Nueva Factura';
+      invoiceForm?.reset();
+      (document.getElementById('invoiceId') as HTMLInputElement).value = '';
+      calculateTotal();
+      modal?.classList.remove('hidden');
+    });
+
+    // Close modal
+    const closeModal = () => {
+      modal?.classList.add('hidden');
+      invoiceForm?.reset();
+    };
+
+    closeModalBtn?.addEventListener('click', closeModal);
+    cancelBtn?.addEventListener('click', closeModal);
+
+    // Close modal on outside click
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // View invoice
+    document.querySelectorAll('.view-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const invoiceData = btn.getAttribute('data-invoice');
+        if (!invoiceData) return;
+
+        const invoice = JSON.parse(invoiceData);
+        sileo.info({
+          title: `Factura ${invoice.invoice_number}`,
+          description: `Cliente: ${invoice.customer_name}\nTotal: Q${invoice.total.toFixed(2)}\nEstado: ${invoice.status}`,
+          duration: 5000,
+        });
+      });
+    });
+
+    // Edit invoice
+    document.querySelectorAll('.edit-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const invoiceData = btn.getAttribute('data-invoice');
+        if (!invoiceData) return;
+
+        const invoice = JSON.parse(invoiceData);
+        if (modalTitle) modalTitle.textContent = 'Editar Factura';
+
+        // Fill form
+        (document.getElementById('invoiceId') as HTMLInputElement).value = invoice.id;
+        (document.getElementById('invoice_number') as HTMLInputElement).value = invoice.invoice_number;
+        (document.getElementById('customer_id') as HTMLSelectElement).value = invoice.customer_id || '';
+        (document.getElementById('customer_name') as HTMLInputElement).value = invoice.customer_name;
+        (document.getElementById('customer_email') as HTMLInputElement).value = invoice.customer_email;
+        (document.getElementById('subtotal') as HTMLInputElement).value = invoice.subtotal;
+        (document.getElementById('tax') as HTMLInputElement).value = invoice.tax;
+        (document.getElementById('discount') as HTMLInputElement).value = invoice.discount;
+        (document.getElementById('total') as HTMLInputElement).value = invoice.total;
+        (document.getElementById('status') as HTMLSelectElement).value = invoice.status;
+        (document.getElementById('notes') as HTMLTextAreaElement).value = invoice.notes || '';
+
+        modal?.classList.remove('hidden');
+      });
+    });
+
+    // Submit form
+    invoiceForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(invoiceForm);
+      const invoiceId = formData.get('id');
+      const isEdit = !!invoiceId;
+
+      const data = {
+        id: invoiceId ? parseInt(invoiceId as string) : undefined,
+        invoice_number: formData.get('invoice_number'),
+        customer_id: formData.get('customer_id') ? parseInt(formData.get('customer_id') as string) : null,
+        customer_name: formData.get('customer_name'),
+        customer_email: formData.get('customer_email'),
+        subtotal: parseFloat(formData.get('subtotal') as string),
+        tax: parseFloat(formData.get('tax') as string),
+        discount: parseFloat(formData.get('discount') as string),
+        total: parseFloat(formData.get('total') as string),
+        status: formData.get('status'),
+        notes: formData.get('notes') || null,
+      };
+
+      try {
+        const response = await fetch('/api/invoices', {
+          method: isEdit ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          sileo.success({ description: isEdit ? 'Factura actualizada exitosamente' : 'Factura creada exitosamente' });
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          const error = await response.json();
+          sileo.error({ description: error.error || 'Error al guardar la factura' });
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        sileo.error({ description: 'Error de conexión' });
+      }
+    });
+
+    // Handle logout
+    const logoutForm = document.querySelector('form[action="/api/auth/logout"]');
+    if (logoutForm) {
+      logoutForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        try {
+          const response = await fetch('/api/auth/logout', {
+            method: 'POST',
+          });
+          
+          if (response.ok) {
+            window.location.href = '/login';
+          }
+        } catch (error) {
+          console.error('Logout error:', error);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
