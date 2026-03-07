@@ -1,7 +1,7 @@
 ---
 // Simple debug page to test database connection
 import { db } from '../db';
-import { sql } from 'drizzle-orm';
+import { shoes } from '../db/schema';
 
 let dbStatus = 'not tested';
 let error: any = null;
@@ -13,7 +13,7 @@ let envVars = {
 
 try {
   // Try a simple query
-  const result = await db.execute(sql`SELECT 1 as test`);
+  const result = await db.select().from(shoes).limit(1);
   dbStatus = 'connected';
 } catch (e: any) {
   dbStatus = 'error';
