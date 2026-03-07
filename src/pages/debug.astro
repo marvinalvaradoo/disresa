@@ -1,7 +1,10 @@
 ---
 // Simple debug page to test database connection
+import { db } from '../db';
+import { sql } from 'drizzle-orm';
+
 let dbStatus = 'not tested';
-let error = null;
+let error: any = null;
 let envVars = {
   NODE_ENV: process.env.NODE_ENV || 'not set',
   TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL ? 'SET' : 'NOT SET',
@@ -9,18 +12,15 @@ let envVars = {
 };
 
 try {
-  const { db } = await import('../db');
-  const { sql } = await import('drizzle-orm');
-  
   // Try a simple query
   const result = await db.execute(sql`SELECT 1 as test`);
   dbStatus = 'connected';
-} catch (e) {
+} catch (e: any) {
   dbStatus = 'error';
   error = {
-    message: e.message,
-    name: e.name,
-    stack: e.stack,
+    message: e?.message || 'Unknown error',
+    name: e?.name || 'Error',
+    stack: e?.stack || 'No stack trace',
   };
 }
 ---
