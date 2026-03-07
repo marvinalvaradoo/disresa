@@ -21,7 +21,12 @@ let allCategories: Category[] = [];
 let allBrands: Brand[] = [];
 let formattedShoes: FormattedShoe[] = [];
 
+console.log('🔍 [Homepage] Starting to load data...');
+console.log('🔍 [Homepage] Database URL:', process.env.TURSO_DATABASE_URL ? 'SET' : 'NOT SET');
+console.log('🔍 [Homepage] Auth Token:', process.env.TURSO_AUTH_TOKEN ? 'SET (length: ' + process.env.TURSO_AUTH_TOKEN.length + ')' : 'NOT SET');
+
 try {
+  console.log('🔍 [Homepage] Fetching featured products...');
   // Get featured products
   featuredShoes = await db
     .select({
@@ -34,12 +39,18 @@ try {
     .leftJoin(categories, eq(shoes.category_id, categories.id))
     .where(eq(shoes.is_featured, 1))
     .limit(4);
+  
+  console.log('✅ [Homepage] Featured products loaded:', featuredShoes.length);
 
   // Get all categories
+  console.log('🔍 [Homepage] Fetching categories...');
   allCategories = await db.select().from(categories);
+  console.log('✅ [Homepage] Categories loaded:', allCategories.length);
 
   // Get all brands
+  console.log('🔍 [Homepage] Fetching brands...');
   allBrands = await db.select().from(brands);
+  console.log('✅ [Homepage] Brands loaded:', allBrands.length);
 
   formattedShoes = featuredShoes.map(({ shoe, brand, category }) => ({
     ...shoe,
@@ -48,8 +59,15 @@ try {
     sizes: JSON.parse(shoe.sizes),
     images: shoe.images ? JSON.parse(shoe.images) : [],
   }));
+  
+  console.log('✅ [Homepage] Data loaded successfully!');
 } catch (error) {
-  console.error('Database error:', error);
+  console.error('❌ [Homepage] Database error:', error);
+  console.error('❌ [Homepage] Error details:', {
+    message: error.message,
+    stack: error.stack,
+    name: error.name,
+  });
   // Continue rendering with empty data
 }
 ---
