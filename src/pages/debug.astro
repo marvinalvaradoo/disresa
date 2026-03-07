@@ -1,0 +1,87 @@
+---
+// Simple debug page to test database connection
+let dbStatus = 'not tested';
+let error = null;
+let envVars = {
+  NODE_ENV: process.env.NODE_ENV || 'not set',
+  TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL ? 'SET' : 'NOT SET',
+  TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN ? 'SET' : 'NOT SET',
+};
+
+try {
+  const { db } = await import('../db');
+  const { sql } = await import('drizzle-orm');
+  
+  // Try a simple query
+  const result = await db.execute(sql`SELECT 1 as test`);
+  dbStatus = 'connected';
+} catch (e) {
+  dbStatus = 'error';
+  error = {
+    message: e.message,
+    name: e.name,
+    stack: e.stack,
+  };
+}
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Debug - AVParfum</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+    }
+    .section {
+      background: #2a2a2a;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+    .success { color: #4ade80; }
+    .error { color: #f87171; }
+    pre {
+      background: #000;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Debug Page</h1>
+  
+  <div class="section">
+    <h2>Environment Variables</h2>
+    <pre>{JSON.stringify(envVars, null, 2)}</pre>
+  </div>
+
+  <div class="section">
+    <h2>Database Connection</h2>
+    <p class={dbStatus === 'connected' ? 'success' : 'error'}>
+      Status: <strong>{dbStatus}</strong>
+    </p>
+    {error && (
+      <div>
+        <h3>Error Details:</h3>
+        <pre>{JSON.stringify(error, null, 2)}</pre>
+      </div>
+    )}
+  </div>
+
+  <div class="section">
+    <h3>Links</h3>
+    <ul>
+      <li><a href="/test" style="color: #60a5fa;">Test Page</a></li>
+      <li><a href="/api/health" style="color: #60a5fa;">Health API</a></li>
+      <li><a href="/" style="color: #60a5fa;">Homepage</a></li>
+    </ul>
+  </div>
+</body>
+</html>
