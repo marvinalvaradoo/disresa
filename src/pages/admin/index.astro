@@ -44,43 +44,55 @@ const recentInvoices = await db
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - Admin Disresa</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <title>Dashboard - Admin AV Parfums</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body class="bg-gray-50 font-sans">
   <div class="flex h-screen">
     <!-- Sidebar -->
-    <aside class="w-64 bg-[#0061bd] text-white flex flex-col">
+    <aside class="w-64 bg-black text-white flex flex-col">
       <div class="p-6">
-        <img src="/logo.webp" alt="Disresa" class="h-10 mb-2" />
+        <img src="/new-logo.png" alt="AV Parfums" class="h-10 mb-2 brightness-0 invert" />
         <p class="text-sm text-gray-400">Panel de Administración</p>
       </div>
 
       <nav class="flex-1 px-4">
-        <a href="/admin" class="flex items-center px-4 py-3 bg-[#fef24e] text-[#0061bd] rounded-lg mb-2 font-black">
-          📊 Dashboard
+        <a href="/admin" class="flex items-center px-4 py-3 bg-[#D4AF37] text-black rounded-lg mb-2 font-bold">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+          </svg>
+          Dashboard
         </a>
         <a href="/admin/products" class="flex items-center px-4 py-3 hover:bg-gray-800 rounded-lg mb-2 transition">
-          👟 Productos
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
+          </svg>
+          Productos
         </a>
         <a href="/admin/invoices" class="flex items-center px-4 py-3 hover:bg-gray-800 rounded-lg mb-2 transition">
-          🧾 Facturas
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+          </svg>
+          Facturas
         </a>
         <a href="/admin/customers" class="flex items-center px-4 py-3 hover:bg-gray-800 rounded-lg mb-2 transition">
-          👥 Clientes
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+          </svg>
+          Clientes
         </a>
       </nav>
 
       <div class="p-4 border-t border-gray-800">
         <div class="mb-4">
           <p class="text-sm text-gray-400">Sesión iniciada como:</p>
-          <p class="font-bold">{user.name || user.email}</p>
-          <p class="text-xs text-[#fef24e]">{user.role}</p>
+          <p class="font-semibold">{user.name || user.email}</p>
+          <p class="text-xs text-[#D4AF37]">{user.role}</p>
         </div>
         <form action="/api/auth/logout" method="POST">
           <button
             type="submit"
-            class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition font-bold"
+            class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition font-semibold"
           >
             Cerrar Sesión
           </button>
@@ -120,20 +132,20 @@ const recentInvoices = await db
         <!-- Quick Actions -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <a
-            href="/admin/products/new"
-            class="bg-[#0061bd] text-black p-6 rounded-lg hover:bg-[#004a94] transition text-center font-bold"
+            href="/admin/products"
+            class="bg-[#D4AF37] text-black p-6 rounded-lg hover:bg-[#C5A028] transition text-center font-bold"
           >
             ➕ Agregar Producto
           </a>
           <a
-            href="/admin/invoices/new"
-            class="bg-[#0061bd] text-white p-6 rounded-lg hover:bg-gray-800 transition text-center font-bold"
+            href="/admin/invoices"
+            class="bg-black text-white p-6 rounded-lg hover:bg-gray-800 transition text-center font-bold"
           >
             🧾 Nueva Factura
           </a>
           <a
             href="/"
-            class="border-2 border-black text-black p-6 rounded-lg hover:bg-[#004a94] hover:text-white transition text-center font-bold"
+            class="border-2 border-black text-black p-6 rounded-lg hover:bg-black hover:text-white transition text-center font-bold"
           >
             🏠 Ver Tienda
           </a>

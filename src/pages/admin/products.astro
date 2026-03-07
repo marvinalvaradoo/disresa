@@ -40,43 +40,55 @@ const allCategories = await db.select().from(categories);
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Productos - Admin Disresa</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <title>Productos - Admin AV Parfums</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body class="bg-gray-50 font-sans">
   <div class="flex h-screen">
     <!-- Sidebar -->
-    <aside class="w-64 bg-[#0061bd] text-white flex flex-col">
+    <aside class="w-64 bg-black text-white flex flex-col">
       <div class="p-6">
-        <img src="/logo.webp" alt="Disresa" class="h-10 mb-2" />
+        <img src="/new-logo.png" alt="AV Parfums" class="h-10 mb-2 brightness-0 invert" />
         <p class="text-sm text-gray-400">Panel de Administración</p>
       </div>
 
       <nav class="flex-1 px-4">
         <a href="/admin" class="flex items-center px-4 py-3 hover:bg-gray-800 rounded-lg mb-2 transition">
-          📊 Dashboard
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+          </svg>
+          Dashboard
         </a>
-        <a href="/admin/products" class="flex items-center px-4 py-3 bg-[#fef24e] text-[#0061bd] rounded-lg mb-2 font-black">
-          👟 Productos
+        <a href="/admin/products" class="flex items-center px-4 py-3 bg-[#D4AF37] text-black rounded-lg mb-2 font-bold">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
+          </svg>
+          Productos
         </a>
         <a href="/admin/invoices" class="flex items-center px-4 py-3 hover:bg-gray-800 rounded-lg mb-2 transition">
-          🧾 Facturas
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+          </svg>
+          Facturas
         </a>
         <a href="/admin/customers" class="flex items-center px-4 py-3 hover:bg-gray-800 rounded-lg mb-2 transition">
-          👥 Clientes
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+          </svg>
+          Clientes
         </a>
       </nav>
 
       <div class="p-4 border-t border-gray-800">
         <div class="mb-4">
           <p class="text-sm text-gray-400">Sesión iniciada como:</p>
-          <p class="font-bold">{user.name || user.email}</p>
-          <p class="text-xs text-[#fef24e]">{user.role}</p>
+          <p class="font-semibold">{user.name || user.email}</p>
+          <p class="text-xs text-[#D4AF37]">{user.role}</p>
         </div>
         <form action="/api/auth/logout" method="POST">
           <button
             type="submit"
-            class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition font-bold"
+            class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition font-semibold"
           >
             Cerrar Sesión
           </button>
@@ -90,14 +102,17 @@ const allCategories = await db.select().from(categories);
         <!-- Header -->
         <div class="flex justify-between items-center mb-8">
           <div>
-            <h1 class="text-4xl font-black mb-2">Productos</h1>
-            <p class="text-gray-600">{formattedProducts.length} productos en total</p>
+            <h1 class="text-4xl font-bold mb-2">Fragancias</h1>
+            <p class="text-gray-600">{formattedProducts.length} fragancias en total</p>
           </div>
           <button
             id="openModalBtn"
-            class="bg-[#fef24e] text-[#0061bd] px-6 py-3 rounded-lg font-black hover:bg-[#fdfad7] transition shadow-lg"
+            class="bg-[#D4AF37] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[#C5A028] transition shadow-lg flex items-center gap-2"
           >
-            ➕ Nuevo Producto
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Nueva Fragancia
           </button>
         </div>
 
@@ -158,17 +173,23 @@ const allCategories = await db.select().from(categories);
                     <td class="px-6 py-4">
                       <div class="flex gap-2">
                         <button
-                          class="edit-btn text-blue-600 hover:text-blue-800 font-bold"
+                          class="edit-btn text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1"
                           data-product={JSON.stringify(product)}
                         >
-                          ✏️ Editar
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                          </svg>
+                          Editar
                         </button>
                         <button
-                          class="delete-btn text-red-600 hover:text-red-800 font-bold"
+                          class="delete-btn text-red-600 hover:text-red-800 font-bold flex items-center gap-1"
                           data-id={product.id}
                           data-name={product.name}
                         >
-                          🗑️ Eliminar
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                          </svg>
+                          Eliminar
                         </button>
                       </div>
                     </td>
@@ -186,7 +207,7 @@ const allCategories = await db.select().from(categories);
   <div id="productModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
       <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
-        <h2 id="modalTitle" class="text-2xl font-black">Nuevo Producto</h2>
+        <h2 id="modalTitle" class="text-2xl font-bold">Nueva Fragancia</h2>
         <button id="closeModalBtn" class="text-gray-500 hover:text-black text-2xl">×</button>
       </div>
 
@@ -196,39 +217,39 @@ const allCategories = await db.select().from(categories);
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Name -->
           <div class="md:col-span-2">
-            <label for="name" class="block font-bold mb-2">Nombre del Producto *</label>
+            <label for="name" class="block font-semibold mb-2">Nombre de la Fragancia *</label>
             <input
               type="text"
               id="name"
               name="name"
               required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
-              placeholder="Ej: Skechers Slip-ins Glide-Step"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+              placeholder="Ej: Lattafa Khamrah Dukhan"
             />
           </div>
 
           <!-- Slug -->
           <div class="md:col-span-2">
-            <label for="slug" class="block font-bold mb-2">Slug (URL) *</label>
+            <label for="slug" class="block font-semibold mb-2">Slug (URL) *</label>
             <input
               type="text"
               id="slug"
               name="slug"
               required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
-              placeholder="skechers-slip-ins-glide-step"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+              placeholder="lattafa-khamrah-dukhan"
             />
             <p class="text-sm text-gray-500 mt-1">Se generará automáticamente del nombre</p>
           </div>
 
           <!-- Brand -->
           <div>
-            <label for="brand_id" class="block font-bold mb-2">Marca *</label>
+            <label for="brand_id" class="block font-semibold mb-2">Marca *</label>
             <select
               id="brand_id"
               name="brand_id"
               required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
             >
               <option value="">Seleccionar marca</option>
               {allBrands.map((brand) => (
@@ -239,12 +260,12 @@ const allCategories = await db.select().from(categories);
 
           <!-- Category -->
           <div>
-            <label for="category_id" class="block font-bold mb-2">Categoría *</label>
+            <label for="category_id" class="block font-semibold mb-2">Categoría *</label>
             <select
               id="category_id"
               name="category_id"
               required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
             >
               <option value="">Seleccionar categoría</option>
               {allCategories.map((category) => (
@@ -255,7 +276,7 @@ const allCategories = await db.select().from(categories);
 
           <!-- Price -->
           <div>
-            <label for="price" class="block font-bold mb-2">Precio *</label>
+            <label for="price" class="block font-semibold mb-2">Precio (GTQ) *</label>
             <input
               type="number"
               id="price"
@@ -263,50 +284,76 @@ const allCategories = await db.select().from(categories);
               required
               step="0.01"
               min="0"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
-              placeholder="0.00"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+              placeholder="450.00"
             />
           </div>
 
           <!-- Original Price -->
           <div>
-            <label for="original_price" class="block font-bold mb-2">Precio Original</label>
+            <label for="original_price" class="block font-semibold mb-2">Precio Original (GTQ)</label>
             <input
               type="number"
               id="original_price"
               name="original_price"
               step="0.01"
               min="0"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
               placeholder="0.00"
             />
           </div>
 
           <!-- Stock -->
           <div>
-            <label for="stock" class="block font-bold mb-2">Stock *</label>
+            <label for="stock" class="block font-semibold mb-2">Stock *</label>
             <input
               type="number"
               id="stock"
               name="stock"
               required
               min="0"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
-              placeholder="0"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+              placeholder="20"
             />
           </div>
 
           <!-- Image URL -->
           <div class="md:col-span-2">
-            <label for="image_url" class="block font-bold mb-2">URL de Imagen *</label>
+            <label for="image_url" class="block font-semibold mb-2">URL de Imagen Principal *</label>
             <input
-              type="url"
+              type="text"
               id="image_url"
               name="image_url"
               required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
-              placeholder="https://example.com/image.jpg"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+              placeholder="/img/parfums/Men's/lattafa/Khamrah-Dukhan.webp"
             />
+            <p class="text-sm text-gray-500 mt-1">Ruta de la imagen (ej: /img/parfums/...)</p>
+          </div>
+
+          <!-- Additional Images -->
+          <div class="md:col-span-2">
+            <label class="block font-semibold mb-2">Imágenes Adicionales (Máximo 5 imágenes en total)</label>
+            <div id="imagesContainer" class="space-y-3">
+              <!-- Image preview will be added here -->
+            </div>
+            <div class="mt-3">
+              <label for="imageUpload" class="cursor-pointer inline-flex items-center px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-[#D4AF37] transition">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Agregar Imagen
+              </label>
+              <input
+                type="file"
+                id="imageUpload"
+                accept="image/*"
+                multiple
+                class="hidden"
+              />
+              <p class="text-sm text-gray-500 mt-2">Puedes seleccionar múltiples imágenes. Formatos: JPG, PNG, WEBP</p>
+            </div>
+            <input type="hidden" id="images" name="images" value="[]" />
           </div>
 
           <!-- Sizes -->
@@ -317,21 +364,21 @@ const allCategories = await db.select().from(categories);
               id="sizes"
               name="sizes"
               required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
-              placeholder="5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+              placeholder="100ml, 50ml, 30ml"
             />
-            <p class="text-sm text-gray-500 mt-1">Separar con comas</p>
+            <p class="text-sm text-gray-500 mt-1">Tamaños disponibles, separar con comas</p>
           </div>
 
           <!-- Description -->
           <div class="md:col-span-2">
-            <label for="description" class="block font-bold mb-2">Descripción</label>
+            <label for="description" class="block font-semibold mb-2">Descripción</label>
             <textarea
               id="description"
               name="description"
-              rows="3"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0061bd]"
-              placeholder="Descripción del producto..."
+              rows="4"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+              placeholder="Descripción de la fragancia..."
             ></textarea>
           </div>
 
@@ -342,9 +389,9 @@ const allCategories = await db.select().from(categories);
                 type="checkbox"
                 id="is_featured"
                 name="is_featured"
-                class="w-5 h-5 text-black border-gray-300 rounded focus:ring-2 focus:ring-[#0061bd]"
+                class="w-5 h-5 text-[#D4AF37] border-gray-300 rounded focus:ring-2 focus:ring-[#D4AF37]"
               />
-              <span class="ml-2 font-bold">Producto Destacado</span>
+              <span class="ml-2 font-semibold">Fragancia Destacada</span>
             </label>
           </div>
 
@@ -356,9 +403,9 @@ const allCategories = await db.select().from(categories);
                 id="is_active"
                 name="is_active"
                 checked
-                class="w-5 h-5 text-black border-gray-300 rounded focus:ring-2 focus:ring-[#0061bd]"
+                class="w-5 h-5 text-[#D4AF37] border-gray-300 rounded focus:ring-2 focus:ring-[#D4AF37]"
               />
-              <span class="ml-2 font-bold">Producto Activo</span>
+              <span class="ml-2 font-semibold">Fragancia Activa</span>
             </label>
           </div>
         </div>
@@ -366,14 +413,14 @@ const allCategories = await db.select().from(categories);
         <div class="flex gap-4 mt-6">
           <button
             type="submit"
-            class="flex-1 bg-[#fef24e] text-[#0061bd] px-6 py-3 rounded-lg font-black hover:bg-[#fdfad7] transition shadow-lg"
+            class="flex-1 bg-[#D4AF37] text-black px-6 py-3 rounded-lg font-semibold hover:bg-[#C5A028] transition shadow-lg"
           >
-            Guardar Producto
+            Guardar Fragancia
           </button>
           <button
             type="button"
             id="cancelBtn"
-            class="px-6 py-3 border-2 border-[#0061bd] text-[#0061bd] rounded-lg font-bold hover:bg-[#0061bd] hover:text-white transition"
+            class="px-6 py-3 border-2 border-black text-black rounded-lg font-semibold hover:bg-black hover:text-white transition"
           >
             Cancelar
           </button>
@@ -393,6 +440,12 @@ const allCategories = await db.select().from(categories);
     const modalTitle = document.getElementById('modalTitle');
     const nameInput = document.getElementById('name') as HTMLInputElement;
     const slugInput = document.getElementById('slug') as HTMLInputElement;
+    const imageUpload = document.getElementById('imageUpload') as HTMLInputElement;
+    const imagesContainer = document.getElementById('imagesContainer');
+    const imagesHidden = document.getElementById('images') as HTMLInputElement;
+
+    let uploadedImages: string[] = [];
+    const MAX_IMAGES = 5;
 
     // Auto-generate slug from name
     nameInput?.addEventListener('input', () => {
@@ -403,12 +456,89 @@ const allCategories = await db.select().from(categories);
       if (slugInput) slugInput.value = slug;
     });
 
+    // Handle image upload
+    imageUpload?.addEventListener('change', (e) => {
+      const files = (e.target as HTMLInputElement).files;
+      if (!files) return;
+
+      const remainingSlots = MAX_IMAGES - uploadedImages.length;
+      if (files.length > remainingSlots) {
+        sileo.warning({ description: `Solo puedes agregar ${remainingSlots} imagen(es) más. Máximo ${MAX_IMAGES} imágenes por producto.` });
+        return;
+      }
+
+      Array.from(files).forEach((file) => {
+        if (uploadedImages.length >= MAX_IMAGES) {
+          sileo.warning({ description: `Máximo ${MAX_IMAGES} imágenes por producto` });
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const imageUrl = event.target?.result as string;
+          uploadedImages.push(imageUrl);
+          updateImagesDisplay();
+          updateImagesHidden();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Reset input
+      imageUpload.value = '';
+    });
+
+    function updateImagesDisplay() {
+      if (!imagesContainer) return;
+      
+      // Ensure uploadedImages is an array
+      if (!Array.isArray(uploadedImages)) {
+        uploadedImages = [];
+      }
+      
+      imagesContainer.innerHTML = uploadedImages.map((img, index) => `
+        <div class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg">
+          <img src="${img}" alt="Imagen ${index + 1}" class="w-20 h-20 object-cover rounded" />
+          <div class="flex-1">
+            <p class="text-sm font-semibold">Imagen ${index + 1}</p>
+            <p class="text-xs text-gray-500">${index === 0 ? 'Imagen principal' : 'Imagen adicional'}</p>
+          </div>
+          <button
+            type="button"
+            onclick="removeImage(${index})"
+            class="text-red-600 hover:text-red-800 p-2"
+            aria-label="Eliminar imagen ${index + 1}"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function updateImagesHidden() {
+      if (imagesHidden) {
+        imagesHidden.value = JSON.stringify(uploadedImages);
+      }
+    }
+
+    // Make removeImage available globally
+    (window as any).removeImage = (index: number) => {
+      uploadedImages.splice(index, 1);
+      updateImagesDisplay();
+      updateImagesHidden();
+      sileo.success({ description: 'Imagen eliminada' });
+    };
+
     // Open modal for new product
     openModalBtn?.addEventListener('click', () => {
-      if (modalTitle) modalTitle.textContent = 'Nuevo Producto';
+      if (modalTitle) modalTitle.textContent = 'Nueva Fragancia';
       productForm?.reset();
       (document.getElementById('productId') as HTMLInputElement).value = '';
       (document.getElementById('is_active') as HTMLInputElement).checked = true;
+      uploadedImages = [];
+      updateImagesDisplay();
+      updateImagesHidden();
       modal?.classList.remove('hidden');
     });
 
@@ -416,6 +546,9 @@ const allCategories = await db.select().from(categories);
     const closeModal = () => {
       modal?.classList.add('hidden');
       productForm?.reset();
+      uploadedImages = [];
+      updateImagesDisplay();
+      updateImagesHidden();
     };
 
     closeModalBtn?.addEventListener('click', closeModal);
@@ -433,7 +566,7 @@ const allCategories = await db.select().from(categories);
         if (!productData) return;
 
         const product = JSON.parse(productData);
-        if (modalTitle) modalTitle.textContent = 'Editar Producto';
+        if (modalTitle) modalTitle.textContent = 'Editar Fragancia';
 
         // Fill form
         (document.getElementById('productId') as HTMLInputElement).value = product.id;
@@ -449,6 +582,26 @@ const allCategories = await db.select().from(categories);
         (document.getElementById('description') as HTMLTextAreaElement).value = product.description || '';
         (document.getElementById('is_featured') as HTMLInputElement).checked = product.is_featured === 1;
         (document.getElementById('is_active') as HTMLInputElement).checked = product.is_active === 1;
+
+        // Load existing images
+        try {
+          if (product.images) {
+            if (typeof product.images === 'string') {
+              uploadedImages = JSON.parse(product.images);
+            } else if (Array.isArray(product.images)) {
+              uploadedImages = product.images;
+            } else {
+              uploadedImages = [];
+            }
+          } else {
+            uploadedImages = [];
+          }
+        } catch (e) {
+          console.error('Error parsing images:', e);
+          uploadedImages = [];
+        }
+        updateImagesDisplay();
+        updateImagesHidden();
 
         modal?.classList.remove('hidden');
       });
@@ -473,6 +626,7 @@ const allCategories = await db.select().from(categories);
         stock: parseInt(formData.get('stock') as string),
         image_url: formData.get('image_url'),
         sizes: (formData.get('sizes') as string).split(',').map(s => s.trim()),
+        images: uploadedImages.length > 0 ? uploadedImages : [],
         description: formData.get('description') || null,
         is_featured: formData.get('is_featured') ? 1 : 0,
         is_active: formData.get('is_active') ? 1 : 0,
@@ -486,11 +640,11 @@ const allCategories = await db.select().from(categories);
         });
 
         if (response.ok) {
-          sileo.success({ description: isEdit ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente' });
+          sileo.success({ description: isEdit ? 'Fragancia actualizada exitosamente' : 'Fragancia creada exitosamente' });
           setTimeout(() => window.location.reload(), 1500);
         } else {
           const error = await response.json();
-          sileo.error({ description: error.error || 'Error al guardar el producto' });
+          sileo.error({ description: error.error || 'Error al guardar la fragancia' });
         }
       } catch (error) {
         console.error('Error:', error);
@@ -517,11 +671,11 @@ const allCategories = await db.select().from(categories);
                 });
 
                 if (response.ok) {
-                  sileo.success({ description: 'Producto eliminado exitosamente' });
+                  sileo.success({ description: 'Fragancia eliminada exitosamente' });
                   setTimeout(() => window.location.reload(), 1500);
                 } else {
                   const error = await response.json();
-                  sileo.error({ description: error.error || 'Error al eliminar el producto' });
+                  sileo.error({ description: error.error || 'Error al eliminar la fragancia' });
                 }
               } catch (error) {
                 console.error('Error:', error);

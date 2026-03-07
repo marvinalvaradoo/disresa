@@ -13,7 +13,7 @@
 
 /* Focus visible for better keyboard navigation */
 *:focus-visible {
-  outline: 2px solid #fef24e;
+  outline: 2px solid #D4AF37;
   outline-offset: 2px;
 }
 
@@ -89,7 +89,7 @@ img[width][height] {
   z-index: 99999 !important;
 }
 
-/* Sileo custom styling - Black background theme */
+/* Sileo custom styling - Black theme */
 
 /* Black background for the SVG shape - this creates the rounded design */
 [data-sileo-canvas] path {
@@ -112,27 +112,27 @@ img[width][height] {
   background-color: transparent !important;
 }
 
-/* Yellow text for title */
+/* White text for title */
 [data-sileo-title] {
-  color: #fef24e !important;
+  color: #ffffff !important;
 }
 
-/* Yellow badge */
+/* White badge */
 [data-sileo-badge] {
-  color: #fef24e !important;
+  color: #ffffff !important;
 }
 
 [data-sileo-badge][data-state] {
-  background-color: rgba(254, 242, 78, 0.2) !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
 }
 
-/* Yellow button with black text */
+/* White button with black text */
 [data-sileo-button] {
   color: #000000 !important;
-  background-color: #fef24e !important;
+  background-color: #ffffff !important;
   font-weight: 600 !important;
 }
 
 [data-sileo-button]:hover {
-  background-color: #fdfad7 !important;
+  background-color: #e5e5e5 !important;
 }
