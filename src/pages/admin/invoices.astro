@@ -3,6 +3,7 @@ import { getSession } from '../../lib/auth';
 import { db } from '../../db';
 import { invoices, customers, users } from '../../db/schema';
 import { eq, desc } from 'drizzle-orm';
+import '../../styles/global.css';
 
 // Check authentication
 const user = await getSession(Astro.cookies);
@@ -32,7 +33,6 @@ const allCustomers = await db.select().from(customers);
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Facturas - Admin Disresa</title>
-  <link rel="stylesheet" href="/src/styles/global.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
 </head>
 <body class="bg-gray-50 font-sans">
