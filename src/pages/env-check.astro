@@ -1,0 +1,73 @@
+---
+// Ultra simple env check - no database imports
+const envVars = {
+  NODE_ENV: process.env.NODE_ENV || 'not set',
+  TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL || 'NOT SET',
+  TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN ? `SET (${process.env.TURSO_AUTH_TOKEN.length} chars)` : 'NOT SET',
+  JWT_SECRET: process.env.JWT_SECRET ? 'SET' : 'NOT SET',
+};
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Environment Check - AVParfum</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      padding: 40px;
+      background: #0f172a;
+      color: #e2e8f0;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 { color: #fbbf24; margin-bottom: 30px; }
+    .var {
+      background: #1e293b;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border-left: 4px solid #3b82f6;
+    }
+    .var.set { border-left-color: #10b981; }
+    .var.not-set { border-left-color: #ef4444; }
+    .key { color: #60a5fa; font-weight: bold; }
+    .value { color: #34d399; }
+    .not-set-value { color: #f87171; }
+    pre {
+      background: #000;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Environment Variables Check</h1>
+  
+  {Object.entries(envVars).map(([key, value]) => {
+    const isSet = value !== 'NOT SET' && value !== 'not set';
+    return (
+      <div class={`var ${isSet ? 'set' : 'not-set'}`}>
+        <span class="key">{key}:</span>{' '}
+        <span class={isSet ? 'value' : 'not-set-value'}>{value}</span>
+      </div>
+    );
+  })}
+
+  <h2 style="margin-top: 40px; color: #fbbf24;">Raw JSON:</h2>
+  <pre>{JSON.stringify(envVars, null, 2)}</pre>
+
+  <div style="margin-top: 40px; padding: 20px; background: #1e293b; border-radius: 8px;">
+    <h3 style="color: #fbbf24; margin-top: 0;">Next Steps:</h3>
+    <ul style="line-height: 1.8;">
+      <li>If all variables show "SET" ✅, the problem is with database connection</li>
+      <li>If any show "NOT SET" ❌, add them in Netlify dashboard</li>
+      <li>Go to: <a href="https://app.netlify.com" style="color: #60a5fa;">Netlify Dashboard</a> → Site configuration → Environment variables</li>
+    </ul>
+  </div>
+</body>
+</html>
