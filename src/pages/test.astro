@@ -25,10 +25,31 @@ const envCheck = {
 
     <div class="bg-white rounded-lg shadow-lg p-6">
       <h2 class="text-2xl font-bold mb-4">Próximos Pasos</h2>
-      <ol class="list-decimal list-inside space-y-2">
+      
+      {envCheck.TURSO_AUTH_TOKEN === 'NOT SET' ? (
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+          <h3 class="text-red-800 font-bold mb-2">⚠️ Falta TURSO_AUTH_TOKEN</h3>
+          <p class="text-red-700 mb-2">Para que el sitio funcione en producción, necesitas:</p>
+          <ol class="list-decimal list-inside space-y-2 text-red-700 ml-4">
+            <li>Crear una base de datos Turso: <code class="bg-red-100 px-2 py-1 rounded">turso db create disresa-prod</code></li>
+            <li>Obtener el token: <code class="bg-red-100 px-2 py-1 rounded">turso db tokens create disresa-prod</code></li>
+            <li>Ir a <a href="https://app.netlify.com" target="_blank" class="underline font-bold">Netlify Dashboard</a></li>
+            <li>Site configuration → Environment variables</li>
+            <li>Agregar TURSO_AUTH_TOKEN con el token generado</li>
+            <li>Redeploy el sitio</li>
+          </ol>
+        </div>
+      ) : (
+        <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
+          <h3 class="text-green-800 font-bold mb-2">✅ Variables configuradas correctamente</h3>
+          <p class="text-green-700">Todas las variables de entorno están configuradas.</p>
+        </div>
+      )}
+      
+      <ol class="list-decimal list-inside space-y-2 mt-4">
         <li>Verifica que las variables de entorno arriba estén configuradas</li>
         <li>Visita <a href="/api/health" class="text-blue-600 underline">/api/health</a> para verificar la conexión a la base de datos</li>
-        <li>Si todo está bien, el problema está en la página de inicio</li>
+        <li>Si todo está bien, visita la <a href="/" class="text-blue-600 underline">página de inicio</a></li>
       </ol>
     </div>
 
