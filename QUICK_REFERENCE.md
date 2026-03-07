@@ -16,8 +16,8 @@
 ## 🔐 Admin Credentials
 
 ```
-Email: admin@disresa.com
-Password: Disresa2024!
+Email: admin@avparfum.com
+Password: Avparfum2026!
 ```
 
 ---
@@ -213,7 +213,7 @@ White: #ffffff
 ## 📝 Notes
 
 - Database name: `disresa-prod` (or your chosen name)
-- Admin email: `admin@disresa.com`
+- Admin email: `admin@avparfum.com`
 - Session expires: 24 hours
 - Cart expires: 7 days
 - Free Turso tier: 9GB storage, 1B reads/month

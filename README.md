@@ -330,8 +330,8 @@ Después de ejecutar `npm run db:seed`, puedes usar estas credenciales:
 
 | Campo | Valor |
 |-------|-------|
-| **Email** | admin@disresa.com |
-| **Password** | admin123 |
+| **Email** | admin@avparfum.com |
+| **Password** | Avparfum2026! |
 | **Role** | admin |
 
 ## 🛠️ Desarrollo
@@ -406,7 +406,7 @@ Todos los derechos reservados © 2026 Disresa
 
 ## 📞 Soporte
 
-Para soporte técnico, contacta a: admin@disresa.com
+Para soporte técnico, contacta a: admin@avparfum.com
 
 ---
 

@@ -60,8 +60,8 @@ Visit: **https://avparfum.netlify.app/**
 
 ✅ **Test admin login:**
 Visit: **https://avparfum.netlify.app/login**
-- Email: `admin@disresa.com`
-- Password: `Disresa2024!`
+- Email: `admin@avparfum.com`
+- Password: `Avparfum2026!`
 
 ---
 
