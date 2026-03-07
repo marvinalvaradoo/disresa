@@ -41,13 +41,13 @@ export default function CartButton({ initialCount = 0 }: CartButtonProps) {
   return (
     <a
       href="/cart"
-      className="relative hover:text-[#fef24e] transition focus:outline-none focus:ring-2 focus:ring-[#fef24e] rounded p-1"
+      className="relative text-white hover:text-[#D4AF37] transition focus:outline-none focus:ring-2 focus:ring-[#D4AF37] rounded p-1"
       aria-label={itemCount > 0 ? `Ver carrito con ${itemCount} ${itemCount === 1 ? 'artículo' : 'artículos'}` : 'Ver carrito vacío'}
     >
       <ShoppingCartIcon className="w-6 h-6" aria-hidden="true" />
       {itemCount > 0 && (
         <span 
-          className="absolute -top-2 -right-2 bg-[#fef24e] text-[#0061bd] text-xs font-black rounded-full w-5 h-5 flex items-center justify-center"
+          className="absolute -top-2 -right-2 bg-[#D4AF37] text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
           aria-label={`${itemCount} artículos en el carrito`}
         >
           {itemCount}

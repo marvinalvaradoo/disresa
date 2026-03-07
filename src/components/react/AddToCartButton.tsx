@@ -112,10 +112,10 @@ export default function AddToCartButton({
               onClick={() => setSelectedSize(size)}
               aria-pressed={selectedSize === size}
               aria-label={`Talla ${size}`}
-              className={`border-2 px-4 py-3 rounded-lg font-bold transition focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2 ${
+              className={`border-2 px-4 py-3 rounded-lg font-bold transition focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:ring-offset-2 ${
                 selectedSize === size
-                  ? 'bg-[#0061bd] text-white border-black'
-                  : 'border-black hover:bg-[#004a94] hover:text-white'
+                  ? 'bg-black text-white border-black'
+                  : 'border-black hover:bg-gray-800 hover:text-white'
               }`}
             >
               {size}
@@ -131,7 +131,7 @@ export default function AddToCartButton({
           <button
             onClick={() => setQuantity(Math.max(1, quantity - 1))}
             aria-label="Disminuir cantidad"
-            className="w-10 h-10 border-2 border-black rounded-lg font-bold hover:bg-[#004a94] hover:text-white transition focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-10 h-10 border-2 border-black rounded-lg font-bold hover:bg-gray-800 hover:text-white transition focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={quantity <= 1}
           >
             -
@@ -140,7 +140,7 @@ export default function AddToCartButton({
           <button
             onClick={() => setQuantity(Math.min(stock, quantity + 1))}
             aria-label="Aumentar cantidad"
-            className="w-10 h-10 border-2 border-black rounded-lg font-bold hover:bg-[#004a94] hover:text-white transition focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-10 h-10 border-2 border-black rounded-lg font-bold hover:bg-gray-800 hover:text-white transition focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={quantity >= stock}
           >
             +
@@ -157,7 +157,7 @@ export default function AddToCartButton({
         disabled={isAdding || stock === 0}
         aria-label={stock === 0 ? 'Producto agotado' : 'Agregar producto al carrito'}
         aria-busy={isAdding}
-        className="w-full bg-[#fef24e] text-[#0061bd] px-8 py-4 rounded-lg font-black text-lg hover:bg-[#fdfad7] transition focus:outline-none focus:ring-2 focus:ring-[#0061bd] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+        className="w-full bg-[#D4AF37] text-black px-8 py-4 rounded-lg font-black text-lg hover:bg-[#C5A028] transition focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
       >
         {isAdding ? 'Agregando...' : stock === 0 ? 'Agotado' : 'Agregar al Carrito'}
       </button>
