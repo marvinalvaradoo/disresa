@@ -149,17 +149,17 @@ async function seed() {
     
     // 1. Create admin user
     console.log('👤 Creating admin user...');
-    const hashedPassword = await bcrypt.hash('Disresa2024!', 10);
+    const hashedPassword = await bcrypt.hash('Avparfum2026!', 10);
     await db.insert(schema.users).values({
       id: 'admin-001',
-      email: 'admin@disresa.com',
+      email: 'admin@avparfum.com',
       hashed_password: hashedPassword,
       role: 'admin',
       name: 'Administrator',
     });
     console.log('✅ Admin user created');
-    console.log('   Email: admin@disresa.com');
-    console.log('   Password: Disresa2024!\n');
+    console.log('   Email: admin@avparfum.com');
+    console.log('   Password: Avparfum2026!\n');
     
     // 2. Read products from folder
     console.log('📦 Reading products from /public/img/shoes/...');
@@ -352,8 +352,8 @@ async function seed() {
     console.log(`   • ${customers.length} customers`);
     console.log(`   • 2 sample invoices`);
     console.log('\n🔐 Admin credentials:');
-    console.log('   Email: admin@disresa.com');
-    console.log('   Password: Disresa2024!');
+    console.log('   Email: admin@avparfum.com');
+    console.log('   Password: Avparfum2026!');
     
     process.exit(0);
   } catch (error) {
